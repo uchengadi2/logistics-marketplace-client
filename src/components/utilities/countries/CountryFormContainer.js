@@ -17,13 +17,11 @@ class CountryFormContainer extends React.Component {
   onSubmit = (formValues) => {
     this.props.createCountry(formValues, this.props.token);
     this.props.handleDialogOpenStatus();
-
-    console.log("the form values areeeee:", formValues);
   };
   render() {
     return (
       <div>
-        <CountryForm onSubmit={this.onSubmit} />
+        <CountryForm onSubmit={this.onSubmit} userId={this.props.userId} />
       </div>
     );
   }

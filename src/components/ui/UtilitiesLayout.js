@@ -76,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UtilitiesLayout({ token }) {
+function UtilitiesLayout({ token, userId }) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
@@ -128,16 +128,16 @@ function UtilitiesLayout({ token }) {
         />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <CountryLayout token={token} />
+        <CountryLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <StateLayout token={token} />
+        <StateLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <CurrencyLayout token={token} />
+        <CurrencyLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <ClustersLayout token={token} />
+        <ClustersLayout token={token} userId={userId} />
       </TabPanel>
     </div>
   );

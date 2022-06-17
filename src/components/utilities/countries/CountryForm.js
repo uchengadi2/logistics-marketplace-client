@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     width: 160,
     marginLeft: 170,
     marginTop: 20,
-    marginBottom:20,
+    marginBottom: 20,
     color: "white",
     backgroundColor: theme.palette.common.blue,
     "&:hover": {
@@ -70,6 +70,7 @@ function CountryForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         // style={{ marginTop: 10 }}
 
@@ -98,6 +99,7 @@ function CountryForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         // style={{ marginTop: 10 }}
 
@@ -125,6 +127,7 @@ function CountryForm(props) {
             onChange={handleContinentChange}
             label="Prefered Currency"
             style={{ width: 300 }}
+            {...input}
           >
             <MenuItem value="">
               <em>None</em>
@@ -160,6 +163,7 @@ function CountryForm(props) {
             onChange={handleRegionChange}
             label="Continent Region"
             style={{ width: 190 }}
+            {...input}
           >
             <MenuItem value="">
               <em>None</em>
@@ -206,6 +210,7 @@ function CountryForm(props) {
         {...custom}
         multiline={true}
         minRows={7}
+        {...input}
 
         // style={{ marginTop: 10 }}
 
@@ -215,6 +220,7 @@ function CountryForm(props) {
   };
 
   const renderCountryFlagField = ({
+    floatingLabelText,
     input,
     label,
     meta: { touched, error, invalid },
@@ -222,6 +228,10 @@ function CountryForm(props) {
     id,
     ...custom
   }) => {
+    // if (input.value && input.value[0] && input.value[0].name) {
+    //   floatingLabelText = input.value[0].name;
+    // }
+    delete input.value;
     return (
       <TextField
         id={input.name}
@@ -230,12 +240,47 @@ function CountryForm(props) {
         fullWidth
         style={{ marginTop: 20 }}
         helperText="Upload Country Flag"
+        {...custom}
+        {...input}
+
+        //inputProps={{ multiple: true }}
       />
     );
   };
 
+  //script to upload multiple images at once
+  let images = [];
+  const uploadScreenshotFile = (event) => {
+    for (let size = 0; size < event.target.files.length; size++) {
+      console.log("Selected file:", event.target.files[size]);
+      let file = event.target.files[size];
+      console.log("uploading screenshot file...", file);
+      images.push(file);
+
+      // Do necessary request to upload here.......
+    }
+  };
+
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    // console.log("tis is the counytry formvalues:", formValues);
+    // console.log("the file name is:", formValues.flag[0]);
+    // console.log("the file name is:", formValues.flag[0].name);
+    // console.log("the file type is:", formValues.flag[0].type);
+    // console.log("the file size is:", formValues.flag[0].size);
+    // console.log("the selected images are:", images);
+
+    let data = {};
+
+    data.name = formValues.name;
+    data.code = formValues.code;
+    data.description = formValues.description || "";
+    data.continent = formValues.continent;
+    data.region = formValues.region;
+    data.flag = formValues.flag[0].name;
+    data.image = formValues.flag;
+    data.createdBy = props.userId;
+
+    props.onSubmit(data);
   };
 
   return (
@@ -254,7 +299,7 @@ function CountryForm(props) {
         // onSubmit={onSubmit}
         sx={{
           width: 500,
-          height:420
+          height: 420,
         }}
         noValidate
         autoComplete="off"
@@ -273,8 +318,8 @@ function CountryForm(props) {
           <Grid item style={{ width: "28%", marginLeft: 10 }}>
             <Field
               label=""
-              id="name"
-              name="name"
+              id="code"
+              name="code"
               type="text"
               component={renderCountryCodeField}
             />
@@ -294,7 +339,7 @@ function CountryForm(props) {
             <Field
               label=""
               id="region"
-              name="egion"
+              name="region"
               type="text"
               component={renderContinentRegionsField}
             />
@@ -313,8 +358,13 @@ function CountryForm(props) {
           id="flag"
           name="flag"
           type="file"
+          accept="image/*"
           component={renderCountryFlagField}
+          floatingLabelText={"Upload Image"}
+          fullWidth={true}
           style={{ marginTop: 10 }}
+
+          // onChange={uploadScreenshotFile}
         />
 
         <Button

@@ -673,14 +673,12 @@ export const createCountry = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   return async (dispatch, getState) => {
     const { userId } = getState().auth;
-    const response = await data.post("/countries", {
-      ...formValues,
-      userId,
-    });
+    console.log("the user id id:", userId);
+    console.log("tis is the formvalues at index.js:", formValues);
+    const response = await data.post("/countries", formValues);
+    console.log("this is the response after createtio at index.js:", response);
 
-    //console.log(response);
-    dispatch({ type: CREATE_COUNTRY, payload: response.data });
-    history.push("/utilities/countries");
+    dispatch({ type: CREATE_COUNTRY, payload: response.data.data.data });
   };
 };
 

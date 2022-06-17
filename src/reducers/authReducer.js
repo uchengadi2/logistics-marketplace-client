@@ -15,7 +15,11 @@ export default (state = INITIAL_STATE, action) => {
         isSignedIn: true,
         userId: action.payload.data.user.id,
         data: action.payload,
-        token: { status: action.payload.status, token: action.payload.token },
+        token: {
+          status: action.payload.status,
+          token: action.payload.token,
+          userId: action.payload.data.user.id,
+        },
       };
 
     case SIGN_UP:

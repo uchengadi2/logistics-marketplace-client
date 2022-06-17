@@ -6,6 +6,7 @@ import theme from "./ui/Theme";
 import Dashboard from "./Dashboard/Dashboard";
 import Preferences from "./Preferences/Preferences";
 import useToken from "../custom-hooks/useToken";
+import useUserId from "../custom-hooks/useUserId";
 import UserLogin from "./users/UserLogin";
 import Header from "./ui/Header";
 import IndexDashboard from "./IndexDashboard";
@@ -24,11 +25,12 @@ import TripsLayout from "./ui/TripLayout";
 
 function App() {
   const { token, setToken } = useToken();
+  const { userId, setUserId } = useUserId();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [value, setValue] = useState(0);
 
   if (!token) {
-    return <UserLogin setToken={setToken} />;
+    return <UserLogin setToken={setToken} setUserId={setUserId} />;
   }
 
   return (
@@ -40,44 +42,46 @@ function App() {
             setValue={setValue}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
+            token={token}
+            userId={userId}
           />
           ;
           <Switch>
             <Route exact path="/">
-              <CategoryLayout token={token} />
+              <CategoryLayout token={token} userId={userId} />
             </Route>
             <Route path="/categories">
-              <CategoryLayout token={token} />
+              <CategoryLayout token={token} userId={userId} />
             </Route>
             <Route path="/vendors">
-              <VendorLayout token={token} />
+              <VendorLayout token={token} userId={userId} />
             </Route>
             <Route path="/products">
-              <ProductLayout token={token} />
+              <ProductLayout token={token} userId={userId} />
             </Route>
             <Route path="/cities">
-              <CityLayout token={token} />
+              <CityLayout token={token} userId={userId} />
             </Route>
             <Route path="/users">
-              <UsersLayout token={token} />
+              <UsersLayout token={token} userId={userId} />
             </Route>
             <Route path="/orders">
-              <OrdersLayout token={token} />
+              <OrdersLayout token={token} userId={userId} />
             </Route>
             <Route path="/trips">
-              <TripsLayout token={token} />
+              <TripsLayout token={token} userId={userId} />
             </Route>
             <Route path="/payments">
-              <PaymentLayout token={token} />
+              <PaymentLayout token={token} userId={userId} />
             </Route>
             <Route path="/remittances">
-              <RemittanceLayout token={token} />
+              <RemittanceLayout token={token} userId={userId} />
             </Route>
             <Route path="/utilities">
-              <UtilitiesLayout token={token} />
+              <UtilitiesLayout token={token} userId={userId} />
             </Route>
             <Route path="/policies">
-              <PoliciesLayout token={token} />
+              <PoliciesLayout token={token} userId={userId} />
             </Route>
             <Route path="/dashboard">
               <Dashboard />

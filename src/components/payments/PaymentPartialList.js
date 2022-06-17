@@ -130,22 +130,28 @@ class PaymentPartialList extends React.Component {
     let counter = 0;
     const columns = [
       { field: "numbering", headerName: "S/n", width: 100 },
-      { field: "OrderNumber", headerName: "Order Number", width: 200 },
+      { field: "orderNumber", headerName: "Order Number", width: 200 },
       { field: "paymentStatus", headerName: "Payment Status", width: 200 },
       { field: "vendor", headerName: "Vendor", width: 200 },
+      { field: "customer", headerName: "Customer", width: 200 },
       {
-        field: "totalInitialPaymentExpected",
-        headerName: "Total Initial Payment Expected",
+        field: "totalAmountExpected",
+        headerName: "Total Amount Expected",
         width: 200,
       },
       {
-        field: "initalPaymentMade",
-        headerName: "Initial Payment Made",
+        field: "totalAmountAlreadyPaid",
+        headerName: "Total Amount Already Paid",
         width: 150,
       },
       {
-        field: "initialPaymentStatus",
-        headerName: "Initial Payment Status",
+        field: "lastPaymentRound",
+        headerName: "Last Payment Round",
+        width: 150,
+      },
+      {
+        field: "currentPaymentRound",
+        headerName: "Current Payment Round",
         width: 150,
       },
 
@@ -170,73 +176,58 @@ class PaymentPartialList extends React.Component {
           </strong>
         ),
       },
-      {
-        field: "cancelorder",
-        headerName: "",
-        width: 30,
-        description: "Cancel Order",
-        renderCell: (params) => (
-          <strong>
-            {/* {params.value.getFullYear()} */}
-            <CancelRoundedIcon
-              style={{ color: "black" }}
-              onClick={() => [
-                this.setState({ cancelOpen: true, id: params.id }),
-                history.push(`/payments/partial/cancel/${params.id}`),
-              ]}
-            />
-          </strong>
-        ),
-      },
-      {
-        field: "assignorder",
-        headerName: "",
-        width: 30,
-        description: "Assign Order",
-        renderCell: (params) => (
-          <strong>
-            {/* {params.value.getFullYear()} */}
-            <AssignmentIcon
-              style={{ color: "black" }}
-              onClick={() => [
-                this.setState({ assignOpen: true, id: params.id }),
-                history.push(`/payments/partial/assign/${params.id}`),
-              ]}
-            />
-          </strong>
-        ),
-      },
-      {
-        field: "deleteaction",
-        headerName: "",
-        width: 30,
-        description: "Delete row",
-        renderCell: (params) => (
-          <strong>
-            {/* {params.value.getFullYear()} */}
-            <DeleteRoundedIcon
-              style={{ color: "red" }}
-              onClick={() => [
-                this.setState({ deleteOpen: true, id: params.id }),
-                history.push(`/payments/partial/delete/${params.id}`),
-              ]}
-            />
-          </strong>
-        ),
-      },
     ];
     this.props.payments.map((payment) => {
-      console.log("these are the orderrrrnew:", payment);
       let row = {
         numbering: ++counter,
         id: payment.id,
-        totalInitialPaymentExpected:
-          payment.paymentBreakdown.initialPayment.amountExpected,
-        initalPaymentMade: payment.paymentBreakdown.initialPayment.amountPaid,
-        OrderNumber: payment.order[0],
-        initialPaymentStatus: payment.paymentBreakdown.initialPayment.status,
+        orderNumber: payment.order[0],
+        vendor: payment.vendor[0],
+        customer: payment.customer[0],
+        totalAmountExpected: payment.totalAmountExpected,
+        totalAmountAlreadyPaid: payment.totalAmountAlreadyPaid,
+        lastPaymentAmountMade: payment.lastPaymentAmountMade,
+        lastPaymentRound: payment.lastPaymentRound,
+        currentPaymentRound: payment.currentPaymentRound,
+        startingPaymentDate: payment.startingPaymentDate,
+        lastPaymentDate: payment.lastPaymentDate,
+        agreedPaymentCurrency: payment.agreedPaymentCurrency,
+        preferredPaymentCurrency: payment.preferredPaymentCurrency,
         paymentStatus: payment.paymentStatus,
-        vendor: payment.vendor,
+        initialPaymentAmountExpected:
+          payment.paymentBreakdown.initialPaymentInstallment
+            .initialPaymentAmountExpected,
+        initialPaymentAmountPaid:
+          payment.paymentBreakdown.initialPaymentInstallment
+            .initialPaymentAmountPaid,
+        dateInitialPaymentWasMade:
+          payment.paymentBreakdown.initialPaymentInstallment
+            .dateInitialPaymentWasMade,
+        initialPaymentStatus:
+          payment.paymentBreakdown.initialPaymentInstallment
+            .initialPaymentStatus,
+        secondPaymentAmountExpected:
+          payment.paymentBreakdown.secondInstallmentPayment
+            .secondPaymentAmountExpected,
+        secondPaymentAmountPaid:
+          payment.paymentBreakdown.secondInstallmentPayment
+            .secondPaymentAmountPaid,
+        dateSecondPaymentWasMade:
+          payment.paymentBreakdown.secondInstallmentPayment
+            .dateSecondPaymentWasMade,
+        secondPaymentStatus:
+          payment.paymentBreakdown.secondInstallmentPayment.secondPaymentStatus,
+        thirdPaymentAmountExpected:
+          payment.paymentBreakdown.thirdInstallmentPayment
+            .thirdPaymentAmountExpected,
+        thirdPaymentAmountPaid:
+          payment.paymentBreakdown.thirdInstallmentPayment
+            .thirdPaymentAmountPaid,
+        thirdSecondPaymentWasMade:
+          payment.paymentBreakdown.thirdInstallmentPayment
+            .thirdSecondPaymentWasMade,
+        thirdPaymentStatus:
+          payment.paymentBreakdown.thirdInstallmentPayment.thirdPaymentStatus,
       };
       rows.push(row);
     });
