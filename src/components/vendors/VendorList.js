@@ -51,6 +51,7 @@ class VendorList extends React.Component {
           <DialogContent>
             <VendorEdit
               token={this.props.token}
+              userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
             />
@@ -75,6 +76,7 @@ class VendorList extends React.Component {
           <DialogContent>
             <VendorDelete
               token={this.props.token}
+              userId={this.props.userId}
               id={this.state.id}
               handleDialogOpenStatus={this.handleDialogOpenStatus}
             />

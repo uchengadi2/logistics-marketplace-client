@@ -98,7 +98,6 @@ function VendorLayout(props) {
 
   const handleCountryChange = (value) => {
     setSelectedCountry(value);
-    
   };
 
   const renderDataList = () => {
@@ -108,6 +107,7 @@ function VendorLayout(props) {
       return (
         <VendorsByCountryList
           token={props.token}
+          userId={props.userId}
           selectedCountry={selectedCountry}
         />
       );
@@ -130,6 +130,7 @@ function VendorLayout(props) {
         <Grid item className={classes.selectField}>
           <CountrySelectField
             token={props.token}
+            userId={props.userId}
             selectList={countryList}
             selectedCountry={selectedCountry}
             handleCountryChange={handleCountryChange}
@@ -160,6 +161,7 @@ function VendorLayout(props) {
         <DialogContent>
           <VendorFormContainer
             token={props.token}
+            userId={props.userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />
         </DialogContent>

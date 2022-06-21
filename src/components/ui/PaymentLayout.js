@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function PaymentLayout({ token }) {
+function PaymentLayout({ token, userId }) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
@@ -123,13 +123,13 @@ function PaymentLayout({ token }) {
         />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <PaymentPendingLayout token={token} />
+        <PaymentPendingLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <PartialPaymentLayout token={token} />
+        <PartialPaymentLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <PaymentCompletedLayout token={token} />
+        <PaymentCompletedLayout token={token} userId={userId} />
       </TabPanel>
     </div>
   );

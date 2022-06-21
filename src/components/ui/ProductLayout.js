@@ -149,11 +149,12 @@ function ProductLayout(props) {
 
   const renderDataList = () => {
     if (selectedVendor === "all") {
-      return <ProductList token={props.token} />;
+      return <ProductList token={props.token} userId={props.userId} />;
     } else if (selectedVendor !== "all") {
       return (
         <ProductListPerVendor
           token={props.token}
+          userId={props.userId}
           selectedVendor={selectedVendor}
         />
       );
@@ -177,6 +178,7 @@ function ProductLayout(props) {
         <Grid item className={classes.selectField}>
           <VendorSelectFilter
             token={props.token}
+            userId={props.userId}
             vendorList={vendorList}
             selectedVendor={selectedVendor}
             handleVendorChange={handleVendorChange}
@@ -206,6 +208,7 @@ function ProductLayout(props) {
         <DialogContent>
           <ProductFormContainer
             token={props.token}
+            userId={props.userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />
         </DialogContent>

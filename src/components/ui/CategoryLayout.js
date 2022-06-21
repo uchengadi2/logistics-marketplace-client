@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function CategoryLayout({ token }) {
+function CategoryLayout({ token, userId }) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -70,6 +70,8 @@ function CategoryLayout({ token }) {
   };
 
   const width = 12;
+
+  console.log("thsi si userid at layout:", userId);
 
   return (
     <Grid
@@ -104,6 +106,7 @@ function CategoryLayout({ token }) {
       >
         <DialogContent>
           <CategoryFormContainer
+            userId={userId}
             token={token}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />

@@ -69,8 +69,7 @@ function ClusterForm(props) {
         required
         type={type}
         {...custom}
-        //onChange={handleInput}
-        // style={{ marginTop: 10 }}
+        {...input}
       />
     );
   };
@@ -83,6 +82,7 @@ function ClusterForm(props) {
     id,
     ...custom
   }) => {
+    delete input.value;
     return (
       <Box>
         <FormControl variant="outlined">
@@ -92,15 +92,13 @@ function ClusterForm(props) {
             id="type"
             value={type}
             onChange={handleTypeChange}
-            label="Country"
+            label="Cluster Type"
             style={{ width: 500 }}
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
             <MenuItem value={"city"}>City</MenuItem>
-            <MenuItem value={"state"}>State</MenuItem>
-            <MenuItem value={"country"}>Country</MenuItem>
+            {/* <MenuItem value={"state"}>State</MenuItem>
+            <MenuItem value={"country"}>Country</MenuItem> */}
           </Select>
           <FormHelperText>Select Location Type</FormHelperText>
         </FormControl>
@@ -130,6 +128,7 @@ function ClusterForm(props) {
         {...custom}
         multiline={true}
         minRows={7}
+        {...input}
 
         // style={{ marginTop: 10 }}
 
@@ -139,7 +138,12 @@ function ClusterForm(props) {
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    const data = {
+      name: formValues.name,
+      description: formValues.description,
+      createdBy: props.userId,
+    };
+    props.onSubmit(data);
   };
 
   const required = (value) => (value == null ? "Required" : undefined);
@@ -164,6 +168,7 @@ function ClusterForm(props) {
         // onSubmit={onSubmit}
         sx={{
           width: 500,
+          height: 350,
         }}
         noValidate
         autoComplete="off"
@@ -183,7 +188,7 @@ function ClusterForm(props) {
             />
           </Grid>
         </Grid>
-        <Grid container direction="row" style={{ marginTop: 10 }}>
+        {/* <Grid container direction="row" style={{ marginTop: 10 }}>
           <Grid item>
             <Field
               label=""
@@ -193,7 +198,7 @@ function ClusterForm(props) {
               component={renderClusterTypeField}
             />
           </Grid>
-        </Grid>
+        </Grid> */}
         <Field
           label=""
           id="description"

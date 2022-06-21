@@ -96,11 +96,12 @@ function CityLayout(props) {
 
   const renderDataList = () => {
     if (selectedCountry === "all") {
-      return <CityList token={props.token} />;
+      return <CityList token={props.token} userId={props.userId} />;
     } else {
       return (
         <CitiesInCountryList
           token={props.token}
+          userId={props.userId}
           selectedCountry={selectedCountry}
         />
       );
@@ -122,6 +123,7 @@ function CityLayout(props) {
         <Grid item className={classes.selectField}>
           <CountrySelectField
             token={props.token}
+            userId={props.userId}
             selectList={countryList}
             selectedCountry={selectedCountry}
             handleCountryChange={handleCountryChange}
@@ -152,6 +154,7 @@ function CityLayout(props) {
         <DialogContent>
           <CityFormContainer
             token={props.token}
+            userId={props.userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />
         </DialogContent>

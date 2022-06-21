@@ -51,6 +51,7 @@ class CategoryList extends React.Component {
           <DialogContent>
             <CategoryEdit
               token={this.props.token}
+              userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
             />

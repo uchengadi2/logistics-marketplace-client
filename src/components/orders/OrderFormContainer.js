@@ -31,4 +31,10 @@ class OrderFormContainer extends React.Component {
   }
 }
 
+// const mapStateToProps = (state) => {
+//   console.log("this is the order status:", state.order.status);
+//   // return { status: state.order.status };
+//   return null;
+// };
+
 export default connect(null, { createOrder })(OrderFormContainer);

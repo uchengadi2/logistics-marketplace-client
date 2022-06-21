@@ -75,6 +75,7 @@ function UserForm(props) {
         type={type}
         {...custom}
         style={{ marginTop: 15 }}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -100,6 +101,7 @@ function UserForm(props) {
             onChange={handleUserRoleChange}
             label="Role"
             style={{ marginTop: 15, width: 500 }}
+            {...input}
           >
             <MenuItem value={"admin"}>Admin</MenuItem>
             <MenuItem value={"user"}>User</MenuItem>
@@ -134,6 +136,7 @@ function UserForm(props) {
         type={type}
         {...custom}
         style={{ marginTop: 15 }}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -161,6 +164,7 @@ function UserForm(props) {
         type={type}
         {...custom}
         style={{ marginTop: 15 }}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -214,6 +218,7 @@ function UserForm(props) {
             name="type"
             value={value}
             onChange={handleTypeChange}
+            {...input}
           >
             <Grid item container direction="row">
               <Grid item>
@@ -245,7 +250,18 @@ function UserForm(props) {
     );
   };
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    console.log("this is the formvakues:", formValues);
+    const data = {
+      name: formValues.name,
+      email: formValues.email,
+      role: formValues.role,
+      password: formValues.password,
+      passwordConfirm: formValues.passwordConfirm,
+      type: formValues.type,
+    };
+
+    console.log("this is the data:", data);
+    props.onSubmit(data);
   };
 
   return (

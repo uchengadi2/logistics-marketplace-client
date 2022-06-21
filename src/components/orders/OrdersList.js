@@ -237,8 +237,8 @@ class OrdersList extends React.Component {
         dateOrdered: order.dateOrdered,
         orderedQuantity: order.orderQuantity,
         status: order.status,
-        consignmentCountry: order.consignmentCountry[0],
-        destinationCountry: order.destinationCountry[0],
+        consignmentCountry: order.consignmentCountry,
+        destinationCountry: order.destinationCountry,
         category: order.category,
       };
       rows.push(row);

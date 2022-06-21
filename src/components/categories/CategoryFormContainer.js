@@ -31,7 +31,7 @@ class CategoryFormContainer extends React.Component {
   render() {
     return (
       <div>
-        <CategoryForm onSubmit={this.onSubmit} />
+        <CategoryForm onSubmit={this.onSubmit} userId={this.props.userId} />
       </div>
     );
   }

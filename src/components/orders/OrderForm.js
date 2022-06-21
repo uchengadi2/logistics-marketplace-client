@@ -1069,7 +1069,10 @@ function OrderForm(props) {
       consignment: {
         name: formValues["consignmentType"],
         description: formValues["consignmentDescription"],
-        weight: formValues["consignmentWeight"],
+        weight: {
+          weight: formValues["consignmentWeight"],
+          unit: "kg",
+        },
         owner: formValues["consignmentOwner"],
         type: formValues["consignmentType"],
         quantity: "",
@@ -1110,9 +1113,9 @@ function OrderForm(props) {
         },
       },
     };
-    props.onSubmit(data, props.token);
+    props.onSubmit(data);
 
-    props.handleBookingsOpenDialogStatus();
+    //props.handleBookingsOpenDialogStatus();
   };
 
   return (
@@ -1358,7 +1361,7 @@ function OrderForm(props) {
           id="destinationPlaceType"
           name="destinationPlaceType"
           type="text"
-          component={renderSourcePlaceTypeField}
+          component={renderDestinationPlaceTypeField}
         />
         <FormLabel
           style={{ color: "blue", marginTop: 15, fontSize: "1em" }}

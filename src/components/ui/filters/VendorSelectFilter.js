@@ -122,33 +122,34 @@ function VendorSelectFilter(props) {
 
   return (
     <div className={classes.root}>
-      <form id="VendorSelectFilterForm" className={classes.formStyles}>
-        <Box
-          sx={{
-            width: 500,
-            height: 50,
-          }}
-          noValidate
-          autoComplete="off"
+      {/* <form id="VendorSelectFilterForm" className={classes.formStyles}> */}
+      <Box
+        sx={{
+          width: 500,
+          height: 50,
+        }}
+        noValidate
+        autoComplete="off"
+        type="form"
+      >
+        <Grid
+          container
+          direction="row"
+          //style={{ marginTop: 20 }}
+          //justifyContent="center"
+          //style={{ width: 1000 }}
         >
-          <Grid
-            container
-            direction="row"
-            //style={{ marginTop: 20 }}
-            //justifyContent="center"
-            //style={{ width: 1000 }}
-          >
-            <Grid item>
-              <Field
-                label=""
-                id="value"
-                name="value"
-                type="text"
-                component={renderSelectField}
-                autoComplete="off"
-                //style={{ marginTop: 20 }}
-              />
-              {/* <Grid item>
+          <Grid item>
+            <Field
+              label=""
+              id="value"
+              name="value"
+              type="text"
+              component={renderSelectField}
+              autoComplete="off"
+              //style={{ marginTop: 20 }}
+            />
+            {/* <Grid item>
                 <Button
                   variant="contained"
                   className={classes.submitButton}
@@ -157,10 +158,10 @@ function VendorSelectFilter(props) {
                   Submit
                 </Button>
               </Grid> */}
-            </Grid>
           </Grid>
-        </Box>
-      </form>
+        </Grid>
+      </Box>
+      {/* </form> */}
     </div>
   );
 }

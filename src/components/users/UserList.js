@@ -136,7 +136,7 @@ class UserList extends React.Component {
     this.props.users.map((user) => {
       let row = {
         numbering: ++counter,
-        id: user.id,
+        id: user.email,
         name: user.name,
         type: user.type,
         role: user.role,

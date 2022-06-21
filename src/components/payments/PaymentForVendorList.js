@@ -243,7 +243,6 @@ function PaymentForVendorList(props) {
       },
     ];
     paymentList.map((payment) => {
-      console.log("these are the orderrrrnew:", payment);
       let row = {
         numbering: ++counter,
         id: payment.id,

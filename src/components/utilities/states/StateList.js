@@ -52,6 +52,7 @@ class StateList extends React.Component {
           <DialogContent>
             <StateEdit
               token={this.props.token}
+              userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
             />
@@ -76,6 +77,7 @@ class StateList extends React.Component {
           <DialogContent>
             <StateDelete
               token={this.props.token}
+              userId={this.props.userId}
               id={this.state.id}
               handleDialogOpenStatus={this.handleDialogOpenStatus}
             />
@@ -113,7 +115,6 @@ class StateList extends React.Component {
       { field: "code", headerName: "State Code", width: 200 },
       { field: "country", headerName: "Country", width: 200 },
       { field: "region", headerName: "Country Region", width: 200 },
-      { field: "description", headerName: "Description", width: 200 },
 
       {
         field: "editaction",
@@ -180,6 +181,7 @@ class StateList extends React.Component {
         name: state.name,
         code: state.code,
         region: state.region,
+        country: state.country,
         description: state.description,
       };
       rows.push(row);

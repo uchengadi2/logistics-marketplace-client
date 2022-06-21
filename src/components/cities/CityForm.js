@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Field, reduxForm } from "redux-form";
+import { Field, formValueSelector, reduxForm } from "redux-form";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -139,6 +139,7 @@ function CityForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -165,6 +166,7 @@ function CityForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -190,6 +192,7 @@ function CityForm(props) {
             onChange={handleStateChange}
             label="State"
             style={{ marginTop: 20, width: 500 }}
+            {...input}
           >
             {renderStateList()}
           </Select>
@@ -220,6 +223,7 @@ function CityForm(props) {
             onChange={handleCountryChange}
             label="Country"
             style={{ marginTop: 20, width: 500 }}
+            {...input}
           >
             {renderCountryList()}
           </Select>
@@ -250,15 +254,24 @@ function CityForm(props) {
         type={type}
         style={{ marginTop: 20 }}
         multiline={true}
-        minRows={5}
+        minRows={3}
         {...custom}
+        {...input}
         // onChange={handleInput}
       />
     );
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    const data = {
+      name: formValues.name,
+      code: formValues.code || " ",
+      description: formValues.description || " ",
+      country: formValues.country,
+      state: formValues.state,
+      createdBy: props.userId,
+    };
+    props.onSubmit(data);
   };
 
   return (
@@ -277,7 +290,7 @@ function CityForm(props) {
         // onSubmit={onSubmit}
         sx={{
           width: 500,
-          height: 420,
+          height: 450,
         }}
         noValidate
         autoComplete="off"

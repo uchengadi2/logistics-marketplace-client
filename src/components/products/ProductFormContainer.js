@@ -12,20 +12,20 @@ class ProductFormContainer extends React.Component {
       open: false,
     };
   }
-  componentDidMount() {
-    console.log("a;; the props are:", this.props);
-  }
+  componentDidMount() {}
 
   onSubmit = (formValues) => {
-    this.props.createVendor(formValues, this.props.token);
-    this.props.handleDialogOpenStatus();
-
-    console.log("the form values areeeee:", formValues);
+    this.props.createProduct(formValues, this.props.token);
+    //this.props.handleDialogOpenStatus();
   };
   render() {
     return (
       <div>
-        <ProductForm onSubmit={this.onSubmit} token={this.props.token} />
+        <ProductForm
+          onSubmit={this.onSubmit}
+          token={this.props.token}
+          userId={this.props.userId}
+        />
       </div>
     );
   }

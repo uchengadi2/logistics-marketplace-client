@@ -209,7 +209,7 @@ function CountryForm(props) {
         type={type}
         {...custom}
         multiline={true}
-        minRows={7}
+        minRows={4}
         {...input}
 
         // style={{ marginTop: 10 }}
@@ -243,7 +243,7 @@ function CountryForm(props) {
         {...custom}
         {...input}
 
-        //inputProps={{ multiple: true }}
+        // inputProps={{ type: "file" }}
       />
     );
   };
@@ -262,25 +262,18 @@ function CountryForm(props) {
   };
 
   const onSubmit = (formValues) => {
-    // console.log("tis is the counytry formvalues:", formValues);
-    // console.log("the file name is:", formValues.flag[0]);
-    // console.log("the file name is:", formValues.flag[0].name);
-    // console.log("the file type is:", formValues.flag[0].type);
-    // console.log("the file size is:", formValues.flag[0].size);
-    // console.log("the selected images are:", images);
+    const form = new FormData();
+    form.append("name", formValues.name);
+    form.append("code", formValues.code);
+    form.append("description", formValues.description);
+    form.append("continent", formValues.continent);
+    form.append("region", formValues.region);
+    form.append("createdBy", props.userId);
+    if (formValues.flag) {
+      form.append("flag", formValues.flag[0]);
+    }
 
-    let data = {};
-
-    data.name = formValues.name;
-    data.code = formValues.code;
-    data.description = formValues.description || "";
-    data.continent = formValues.continent;
-    data.region = formValues.region;
-    data.flag = formValues.flag[0].name;
-    data.image = formValues.flag;
-    data.createdBy = props.userId;
-
-    props.onSubmit(data);
+    props.onSubmit(form);
   };
 
   return (
@@ -299,7 +292,7 @@ function CountryForm(props) {
         // onSubmit={onSubmit}
         sx={{
           width: 500,
-          height: 420,
+          height: 450,
         }}
         noValidate
         autoComplete="off"

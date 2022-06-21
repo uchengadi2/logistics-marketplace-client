@@ -15,7 +15,11 @@ export default (state = {}, action) => {
     case FETCH_ORDER:
       return { ...state, [action.payload.id]: action.payload };
     case CREATE_ORDER:
-      return { ...state, [action.payload.id]: action.payload };
+      return {
+        ...state,
+        //status: action.payload.status,
+        [action.payload.id]: action.payload,
+      };
     case EDIT_ORDER:
       return { ...state, [action.payload.id]: action.payload };
     case DELETE_ORDER:

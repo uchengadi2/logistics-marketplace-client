@@ -52,6 +52,7 @@ class ProductList extends React.Component {
           <DialogContent>
             <ProductEdit
               token={this.props.token}
+              userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
             />
@@ -76,6 +77,7 @@ class ProductList extends React.Component {
           <DialogContent>
             <ProductDelete
               token={this.props.token}
+              userId={this.props.userId}
               id={this.state.id}
               handleDialogOpenStatus={this.handleDialogOpenStatus}
             />

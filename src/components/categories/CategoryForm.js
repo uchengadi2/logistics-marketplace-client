@@ -62,7 +62,6 @@ function CategoryForm(props) {
   }) => {
     return (
       <TextField
-        {...input}
         //error={touched && invalid}
         helperText="Enter the name of the Category"
         variant="outlined"
@@ -75,8 +74,7 @@ function CategoryForm(props) {
         //required
         type={type}
         {...custom}
-        //{...input}
-        //onChange={handleNameChange}
+        {...input}
       />
     );
   };
@@ -91,7 +89,6 @@ function CategoryForm(props) {
   }) => {
     return (
       <TextField
-        {...input}
         error={touched && invalid}
         //placeholder="category description"
         variant="outlined"
@@ -106,7 +103,7 @@ function CategoryForm(props) {
         multiline={true}
         minRows={6}
         {...custom}
-        //onChange={handleDescriptionChange}
+        {...input}
       />
     );
   };
@@ -119,26 +116,31 @@ function CategoryForm(props) {
     id,
     ...custom
   }) => {
+    delete input.value;
     return (
       <TextField
         id={input.name}
         variant="outlined"
         type={type}
-        //value={image}
-        //name={input.name}
         fullWidth
         style={{ marginTop: 20 }}
-        onChange={onImageChange}
         helperText="Upload Category Image"
-        //{...input}
+        {...input}
         {...custom}
       />
     );
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
-    //console.log("deep look at the formvalues:", formValues);
+    const form = new FormData();
+    form.append("name", formValues.name);
+    form.append("description", formValues.description);
+    form.append("createdBy", props.userId);
+    if (formValues.image) {
+      form.append("image", formValues.image[0]);
+    }
+
+    props.onSubmit(form);
   };
 
   return (
@@ -183,7 +185,15 @@ function CategoryForm(props) {
           component={renderDescriptionField}
         />
 
-        <Field name="image" type="file" component={renderImageField} />
+        <Field
+          id="image"
+          name="image"
+          type="file"
+          accept="image/*"
+          component={renderImageField}
+          floatingLabelText={"Upload Image"}
+          fullWidth={true}
+        />
 
         <Button
           variant="contained"

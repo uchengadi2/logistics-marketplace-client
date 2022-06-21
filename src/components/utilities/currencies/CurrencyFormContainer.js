@@ -10,21 +10,16 @@ class CurrencyFormContainer extends React.Component {
       open: false,
     };
   }
-  componentDidMount() {
-    console.log("a;; the props are:", this.props);
-  }
+  componentDidMount() {}
 
   onSubmit = (formValues) => {
     this.props.createCurrency(formValues, this.props.token);
     this.props.handleDialogOpenStatus();
-
-    console.log("the form values areeeee:", formValues);
   };
   render() {
     return (
       <div>
-        <CurrencyForm onSubmit={this.onSubmit} />
-       
+        <CurrencyForm onSubmit={this.onSubmit} userId={this.props.userId} />
       </div>
     );
   }

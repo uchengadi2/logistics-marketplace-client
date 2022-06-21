@@ -4,10 +4,7 @@ import { fetchVendor, editVendor } from "../../actions";
 import VendorEditForm from "./VendorEditForm";
 
 class VendorEdit extends React.Component {
-  componentDidMount() {
-    
-  }
-
+  componentDidMount() {}
 
   onSubmit = (formValues) => {
     this.props.editVendor(this.props.params.id, formValues, this.props.token);
@@ -16,12 +13,12 @@ class VendorEdit extends React.Component {
     //console.log("the form values areeeee:", formValues);
   };
 
-
   render() {
     return (
       <>
         <VendorEditForm
           token={this.props.token}
+          userId={this.props.userId}
           params={this.props.params}
           handleEditDialogOpenStatus={this.props.handleEditDialogOpenStatus}
           onSubmit={this.onSubmit}

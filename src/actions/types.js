@@ -61,6 +61,7 @@ export const FETCH_PAYMENTS = "FETCH_PAYMENTS";
 export const FETCH_PAYMENT = "FETCH_PAYMENT";
 export const DELETE_PAYMENT = "DELETE_PAYMENT";
 export const EDIT_PAYMENT = "EDIT_PAYMENT";
+export const BOOK_PAYMENT = "BOOK_PAYMENT";
 
 // for remittance resources
 export const PROCESS_REMITTANCE = "PROCESS_REMITTANCE";

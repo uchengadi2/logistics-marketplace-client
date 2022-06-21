@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Field, reduxForm } from "redux-form";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { TextField } from "@material-ui/core";
+import { TextField, Typography } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
@@ -13,6 +13,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
+import data from "./../../../apis/local";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 10,
     height: 40,
     width: 120,
-    marginLeft: 180,
+    marginLeft: 190,
     marginTop: 30,
     color: "white",
     backgroundColor: theme.palette.common.blue,
@@ -40,6 +41,7 @@ function StateForm(props) {
 
   const [country, setCountry] = useState();
   const [region, setRegion] = useState();
+  const [countryList, setCountryList] = useState([]);
 
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
@@ -47,6 +49,34 @@ function StateForm(props) {
 
   const handleRegionChange = (event) => {
     setRegion(event.target.value);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let allData = [];
+      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await data.get("/countries");
+      const workingData = response.data.data.data;
+      workingData.map((country) => {
+        allData.push({ id: country._id, name: country.name });
+      });
+      setCountryList(allData);
+    };
+
+    //call the function
+
+    fetchData().catch(console.error);
+  }, []);
+
+  //get the country list
+  const renderCountryList = () => {
+    return countryList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
   };
 
   const renderStateNameField = ({
@@ -69,10 +99,7 @@ function StateForm(props) {
         //required
         type={type}
         {...custom}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        {...input}
       />
     );
   };
@@ -97,10 +124,7 @@ function StateForm(props) {
         //required
         type={type}
         {...custom}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        {...input}
       />
     );
   };
@@ -124,15 +148,9 @@ function StateForm(props) {
             onChange={handleCountryChange}
             label="Country"
             style={{ width: 300 }}
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"africa"}>Africa</MenuItem>
-            <MenuItem value={"europe"}>Europe</MenuItem>
-            <MenuItem value={"asia"}>Asia</MenuItem>
-            <MenuItem value={"north-america"}>North America</MenuItem>
-            <MenuItem value={"south-america"}>South America</MenuItem>
+            {renderCountryList()}
           </Select>
           <FormHelperText>Select Country</FormHelperText>
         </FormControl>
@@ -159,10 +177,8 @@ function StateForm(props) {
             onChange={handleRegionChange}
             label="Country Region"
             style={{ width: 190 }}
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
             <MenuItem value={"west"}>West</MenuItem>
             <MenuItem value={"east"}>East</MenuItem>
             <MenuItem value={"north"}>North</MenuItem>
@@ -204,17 +220,23 @@ function StateForm(props) {
         type={type}
         {...custom}
         multiline={true}
-        minRows={7}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        minRows={4}
+        {...input}
       />
     );
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    const data = {
+      name: formValues.name,
+      region: formValues.region,
+      description: formValues.description,
+      country: formValues.country,
+      code: formValues.code,
+      createdBy: props.userId,
+    };
+
+    props.onSubmit(data);
   };
 
   return (
@@ -224,7 +246,7 @@ function StateForm(props) {
           style={{ color: "blue", fontSize: "1.5em" }}
           component="legend"
         >
-          Enter New State Details
+          <Typography variant="h5">Enter New State Details</Typography>
         </FormLabel>
       </Grid>
       <Box
@@ -251,8 +273,8 @@ function StateForm(props) {
           <Grid item style={{ width: "28%", marginLeft: 10 }}>
             <Field
               label=""
-              id="name"
-              name="name"
+              id="code"
+              name="code"
               type="text"
               component={renderStateCodeField}
             />
@@ -272,7 +294,7 @@ function StateForm(props) {
             <Field
               label=""
               id="region"
-              name="egion"
+              name="region"
               type="text"
               component={renderCountryRegionsField}
             />

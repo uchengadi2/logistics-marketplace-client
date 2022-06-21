@@ -40,15 +40,18 @@ const useStyles = makeStyles((theme) => ({
 function AddPaymentForm(props) {
   const classes = useStyles();
 
-  const [orderPayment, setOrderPayment] = useState();
-  const [operationalCurrency, setOperationalCurrency] = useState();
-  const [preferredCurrency, setPreferredCurrency] = useState();
-  const [currentPaymentRound, setCurrentPaymentRound] = useState();
-  const [operationalCurrencyList, setOperationalCurrencyList] = useState([]);
-  const [preferredCurrencyList, setPreferredCurrencyList] = useState([]);
+  const [order, setOrder] = useState({});
+  const [agreedPaymentCurrency, setAgreedPaymentCurrency] = useState();
+  const [
+    agreedNumberOfPaymentInstallements,
+    setAgreedNumberOfPaymentInstallements,
+  ] = useState();
+  const [currencyList, setCurrencyList] = useState([]);
+  const [customer, setCustomer] = useState();
+  const [usersList, setUsersList] = useState([]);
+  const [orderList, setOrderList] = useState([]);
   const [value, setValue] = useState();
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState();
-  const [paymentStatus, setPaymentStatus] = useState();
+  const [selectedOrder, setSelectedOrder] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +62,7 @@ function AddPaymentForm(props) {
       workingData.map((currency) => {
         allData.push({ id: currency._id, name: currency.name });
       });
-      setOperationalCurrencyList(allData);
+      setCurrencyList(allData);
     };
 
     //call the function
@@ -71,12 +74,14 @@ function AddPaymentForm(props) {
     const fetchData = async () => {
       let allData = [];
       data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/currencies");
-      const workingData = response.data.data.data;
-      workingData.map((currency) => {
-        allData.push({ id: currency._id, name: currency.name });
+      const response = await data.get("/orders", {
+        params: { status: "pending" },
       });
-      setPreferredCurrencyList(allData);
+      const workingData = response.data.data.data;
+      workingData.map((order) => {
+        allData.push({ id: order._id, orderNumber: order.orderNumber });
+      });
+      setOrderList(allData);
     };
 
     //call the function
@@ -84,48 +89,59 @@ function AddPaymentForm(props) {
     fetchData().catch(console.error);
   }, []);
 
-  const handlePaymentStatusChange = (event) => {
-    setPaymentStatus(event.target.value);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      let allData = [];
+      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await data.get("/users");
+      const workingData = response.data.data.data;
+      workingData.map((user) => {
+        allData.push({ id: user._id, name: user.name });
+      });
+      setUsersList(allData);
+    };
 
-  const handleCurrentPaymentValue = (event) => {
-    setValue(event.target.value);
-  };
+    //call the function
 
-  const handleOrderPaymentChange = (event) => {
-    setOrderPayment(event.target.value);
-  };
+    fetchData().catch(console.error);
+  }, []);
 
-  const handleCurrentPaymentRoundChange = (event) => {
-    setCurrentPaymentRound(event.target.value);
-    //setValue(event.target.value);
-  };
+  useEffect(() => {
+    setValue((state) => {
+      console.log("lets get know what is the new state value:", state); // "React is awesome!"
 
-  const handleOperationalCurrencyChange = (event) => {
-    setOperationalCurrency(event.target.value);
-  };
-
-  const handlePreferredCurrencyChange = (event) => {
-    setPreferredCurrency(event.target.value);
-  };
-
-  const paymentStatusList = ["pending", "partial", "full"];
-
-  //retrieve all payment status
-
-  const renderPaymentStatusList = () => {
-    return paymentStatusList.map((item, index) => {
-      return (
-        <MenuItem key={item} value={item}>
-          {item}
-        </MenuItem>
-      );
+      // return state;
     });
+  }, [value]);
+
+  const handleOrderChange = (event) => {
+    setOrder(event.target.value);
+    setOrderList(event.target.value);
   };
+
+  const handleCustomerChange = (event) => {
+    console.log("this is th selected customer:", event.target.value);
+    setCustomer(event.target.value);
+    setUsersList(event.target.value);
+  };
+
+  const handleAgreedPaymentInstallmentsChange = (event) => {
+    setValue(event.target.value);
+    setAgreedNumberOfPaymentInstallements(event.target.value);
+  };
+
+  const handleAgreedPaymentCurrencyChange = (event) => {
+    setAgreedPaymentCurrency(event.target.value);
+    setCurrencyList(event.target.value);
+  };
+
+  //const paymentStatusList = ["pending", "partial", "full"];
+
+  console.log("this is teh userlist:", usersList);
 
   //get the operational currency list
-  const renderOperationalCurrencyList = () => {
-    return operationalCurrencyList.map((item) => {
+  const renderCurrencyList = () => {
+    return currencyList.map((item) => {
       return (
         <MenuItem key={item.id} value={item.id}>
           {item.name}
@@ -134,9 +150,20 @@ function AddPaymentForm(props) {
     });
   };
 
-  //get the operational currency list
-  const renderPreferredCurrencyList = () => {
-    return preferredCurrencyList.map((item) => {
+  //get the order list
+  const renderOrderList = () => {
+    return orderList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.orderNumber}
+        </MenuItem>
+      );
+    });
+  };
+
+  //get the user list
+  const renderUserList = () => {
+    return usersList.map((item) => {
       return (
         <MenuItem key={item.id} value={item.id}>
           {item.name}
@@ -160,11 +187,12 @@ function AddPaymentForm(props) {
             Choose the agreed payment installments
           </FormLabel>
           <RadioGroup
-            aria-label="currentPaymentRound"
-            name="currentPaymentRound"
-            value={currentPaymentRound}
-            onChange={handleCurrentPaymentRoundChange}
+            aria-label="agreedNumberOfPaymentInstallements"
+            name="agreedNumberOfPaymentInstallements"
+            value={agreedNumberOfPaymentInstallements}
+            onChange={handleAgreedPaymentInstallmentsChange}
             style={{ marginTop: 10 }}
+            {...input}
           >
             <Grid item container direction="row">
               <Grid item style={{ width: "34%" }}>
@@ -218,7 +246,14 @@ function AddPaymentForm(props) {
         type={type}
         {...custom}
         style={{ marginTop: 10 }}
-        //disabled
+        {...input}
+        // InputProps={{
+        //   inputProps: {
+        //     type: "number",
+        //     max: 1,
+        //     min: 0,
+        //   },
+        // }}
 
         //onChange={handleInput}
       />
@@ -247,7 +282,7 @@ function AddPaymentForm(props) {
         type={type}
         {...custom}
         style={{ marginTop: 10 }}
-        // disabled
+        {...input}
 
         //onChange={handleInput}
       />
@@ -275,7 +310,7 @@ function AddPaymentForm(props) {
         type={type}
         {...custom}
         style={{ marginTop: 10 }}
-        //disabled
+        {...input}
 
         //onChange={handleInput}
       />
@@ -304,8 +339,14 @@ function AddPaymentForm(props) {
         type={type}
         {...custom}
         style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        {...input}
+        // InputProps={{
+        //   inputProps: {
+        //     type: "number",
+        //     max: 1,
+        //     min: 0,
+        //   },
+        // }}
       />
     );
   };
@@ -325,12 +366,13 @@ function AddPaymentForm(props) {
           <Select
             labelId="agreedPaymentCurrency"
             id="agreedPaymentCurrency"
-            value={preferredCurrency}
-            onChange={handlePreferredCurrencyChange}
+            value={agreedPaymentCurrency}
+            onChange={handleAgreedPaymentCurrencyChange}
             // label="Prefered Currency"
-            style={{ marginTop: 10, width: 200 }}
+            style={{ marginTop: 10, width: 210 }}
+            {...input}
           >
-            {renderPreferredCurrencyList()}
+            {renderCurrencyList()}
           </Select>
           <FormHelperText>Select Agreed Payment Currency</FormHelperText>
         </FormControl>
@@ -353,12 +395,13 @@ function AddPaymentForm(props) {
           <Select
             labelId="order"
             id="order"
-            value={paymentStatus}
-            onChange={handlePaymentStatusChange}
+            value={order}
+            onChange={handleOrderChange}
             // label="Order"
-            style={{ marginTop: 10, width: 150 }}
+            style={{ marginTop: 10, width: 250 }}
+            {...input}
           >
-            {renderPaymentStatusList()}
+            {renderOrderList()}
           </Select>
           <FormHelperText>Select Order</FormHelperText>
         </FormControl>
@@ -366,7 +409,7 @@ function AddPaymentForm(props) {
     );
   };
 
-  const renderOrderedCustomerid = ({
+  const renderOrderCustomer = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -381,12 +424,13 @@ function AddPaymentForm(props) {
           <Select
             labelId="customer"
             id="customer"
-            value={paymentStatus}
-            onChange={handlePaymentStatusChange}
+            value={customer}
+            onChange={handleCustomerChange}
             // label="Customer"
-            style={{ marginTop: 10, width: 160 }}
+            style={{ marginTop: 10, marginLeft: 10, width: 260 }}
+            {...input}
           >
-            {renderPaymentStatusList()}
+            {renderUserList()}
           </Select>
           <FormHelperText>Select Customer</FormHelperText>
         </FormControl>
@@ -394,36 +438,102 @@ function AddPaymentForm(props) {
     );
   };
 
-  const renderVendorsForOrderid = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="vendor"
-            id="vendor"
-            value={paymentStatus}
-            onChange={handlePaymentStatusChange}
-            // label="Vendor"
-            style={{ marginTop: 10, width: 180 }}
-          >
-            {renderPaymentStatusList()}
-          </Select>
-          <FormHelperText>Select Vendor</FormHelperText>
-        </FormControl>
-      </Box>
-    );
-  };
-
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    let percentageForInitialPayment = 0;
+    let initialPaymentAmountExpected = 0;
+    let percentageForSecondPayment = 0;
+    let secondPaymentAmountExpected = 0;
+    let percentageForThirdPayment = 0;
+    let thirdPaymentAmountExpected = 0;
+    let initialPaymentPercentage = 0;
+    let remainingPercentage = 0;
+
+    if (parseInt(formValues.agreedNumberOfPaymentInstallements) === 1) {
+      percentageForInitialPayment = 1;
+      initialPaymentAmountExpected = formValues.totalAmountExpected;
+      percentageForSecondPayment = 0;
+      secondPaymentAmountExpected = 0;
+      percentageForThirdPayment = 0;
+      thirdPaymentAmountExpected = 0;
+    } else if (parseInt(formValues.agreedNumberOfPaymentInstallements) === 2) {
+      const total =
+        parseFloat(formValues.percentageForInitialPayment) +
+        parseFloat(formValues.percentageForSecondPayment);
+      if (parseInt(total) === 1) {
+        if (formValues.percentageForInitialPayment < 1) {
+          initialPaymentPercentage = parseFloat(
+            formValues.percentageForInitialPayment
+          );
+          remainingPercentage = 1 - parseFloat(initialPaymentPercentage);
+        } else if (formValues.percentageForSecondPayment < 1) {
+          remainingPercentage = parseFloat(
+            formValues.percentageForSecondPayment
+          );
+          initialPaymentPercentage = 1 - parseFloat(remainingPercentage);
+        } else {
+          remainingPercentage = 0.5;
+          initialPaymentPercentage = 0.5;
+        }
+      } else {
+        remainingPercentage = 0.5;
+        initialPaymentPercentage = 0.5;
+      }
+      percentageForInitialPayment = initialPaymentPercentage;
+      initialPaymentAmountExpected =
+        parseFloat(formValues.totalAmountExpected) * initialPaymentPercentage;
+      percentageForSecondPayment = parseFloat(remainingPercentage);
+      secondPaymentAmountExpected =
+        parseFloat(formValues.totalAmountExpected) *
+        parseFloat(remainingPercentage);
+      percentageForThirdPayment = 0;
+      thirdPaymentAmountExpected = 0;
+    } else if (parseInt(formValues.agreedNumberOfPaymentInstallements) === 3) {
+      const total =
+        parseFloat(formValues.percentageForInitialPayment) +
+        parseFloat(formValues.percentageForSecondPayment) +
+        parseFloat(formValues.percentageForThirdPayment);
+      if (parseInt(total) === 1) {
+        percentageForInitialPayment = formValues.percentageForInitialPayment;
+        initialPaymentAmountExpected =
+          formValues.totalAmountExpected *
+          formValues.percentageForInitialPayment;
+
+        percentageForSecondPayment = formValues.percentageForSecondPayment;
+        secondPaymentAmountExpected =
+          formValues.totalAmountExpected *
+          formValues.percentageForSecondPayment;
+
+        percentageForThirdPayment = formValues.percentageForThirdPayment;
+        thirdPaymentAmountExpected =
+          formValues.totalAmountExpected * formValues.percentageForThirdPayment;
+      }
+    }
+    const data = {
+      order: formValues.order,
+      customer: formValues.customer,
+      totalAmountExpected: formValues.totalAmountExpected,
+      currentPaymentRound: 1,
+      agreedPaymentCurrency: formValues.agreedPaymentCurrency,
+      agreedNumberOfPaymentInstallements:
+        formValues.agreedNumberOfPaymentInstallements,
+      paymentAgreementBookedBy: props.userId,
+      paymentBreakdown: {
+        initialPaymentInstallment: {
+          percentageForInitialPayment: percentageForInitialPayment,
+          initialPaymentAmountExpected: initialPaymentAmountExpected,
+        },
+        secondInstallmentPayment: {
+          percentageForSecondPayment: percentageForSecondPayment,
+          secondPaymentAmountExpected: secondPaymentAmountExpected,
+        },
+        thirdInstallmentPayment: {
+          percentageForThirdPayment: percentageForThirdPayment,
+          thirdPaymentAmountExpected: thirdPaymentAmountExpected,
+        },
+      },
+    };
+
+    props.onSubmit(data);
   };
 
   return (
@@ -449,25 +559,25 @@ function AddPaymentForm(props) {
         style={{ marginTop: 10 }}
       >
         <Grid container direction="row" style={{ marginTop: 10 }}>
-          <Grid item style={{ width: "30%" }}>
+          <Grid item style={{ width: "46%" }}>
             <Field
               label=""
-              id="orderNumber"
-              name="orderNumber"
+              id="order"
+              name="order"
               type="text"
               component={renderOrderForPaymentField}
             />
           </Grid>
-          <Grid item style={{ width: "32%", marginLeft: 10 }}>
+          <Grid item style={{ width: "48%", marginLeft: 10 }}>
             <Field
               label=""
               id="customer"
               name="customer"
               type="text"
-              component={renderOrderedCustomerid}
+              component={renderOrderCustomer}
             />
           </Grid>
-          <Grid item style={{ width: "32%", marginLeft: 10 }}>
+          {/* <Grid item style={{ width: "32%", marginLeft: 10 }}>
             <Field
               label=""
               id="vendor"
@@ -475,7 +585,7 @@ function AddPaymentForm(props) {
               type="text"
               component={renderVendorsForOrderid}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
         <Grid container direction="row">
           <Grid item style={{ width: "40%" }}>
@@ -492,8 +602,8 @@ function AddPaymentForm(props) {
           <Grid item style={{ width: "58%", marginLeft: 10 }}>
             <Field
               label=""
-              id="totalAmountForPayment"
-              name="totalAmountForPayment"
+              id="totalAmountExpected"
+              name="totalAmountExpected"
               type="text"
               component={renderTotalAgreedAmountForPaymentField}
               style={{ marginTop: 10 }}
@@ -504,8 +614,8 @@ function AddPaymentForm(props) {
         <Grid item style={{ marginTop: 10, width: "100%" }}>
           <Field
             label=""
-            id="currentPaymentRound"
-            name="currentPaymentRound"
+            id="agreedNumberOfPaymentInstallements"
+            name="agreedNumberOfPaymentInstallements"
             type="number"
             component={renderSelectablePaymentPhaseField}
           />
@@ -523,8 +633,8 @@ function AddPaymentForm(props) {
           <Grid item style={{ width: "33%", marginLeft: 10 }}>
             <Field
               label=""
-              id="percentageForSecondayment"
-              name="percentageForSecondayment"
+              id="percentageForSecondPayment"
+              name="percentageForSecondPayment"
               type="number"
               component={renderPercentageForSecondPaymentField}
             />

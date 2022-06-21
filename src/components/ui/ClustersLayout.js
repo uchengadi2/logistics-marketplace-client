@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ClustersLayout({ token }) {
+function ClustersLayout({ token, userId }) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -89,7 +89,7 @@ function ClustersLayout({ token }) {
               className={classes.addButton}
               onClick={() => [
                 setOpen(true),
-                history.push("/utilities/states/new"),
+                history.push("/utilities/clusters/new"),
               ]}
             >
               Create Location Cluster
@@ -97,20 +97,21 @@ function ClustersLayout({ token }) {
           </Toolbar>
         </Grid>
         <Grid item className={classes.contentContainer}>
-          <ClusterList token={token} />
+          <ClusterList token={token} userId={userId} />
         </Grid>
       </Grid>
       <Dialog
-       // style={{ zIndex: 1302 }}
+        // style={{ zIndex: 1302 }}
         fullScreen={matchesXS}
         open={open}
         // fullWidth
         // maxWidth="lg"
-        onClose={() => [setOpen(false), history.push("/utilities/states")]}
+        onClose={() => [setOpen(false), history.push("/utilities/clusters")]}
       >
         <DialogContent>
           <ClusterFormContainer
             token={token}
+            userId={userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />
         </DialogContent>

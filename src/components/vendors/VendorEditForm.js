@@ -1149,6 +1149,7 @@ function VendorEditForm(props) {
                 label=""
                 id="type"
                 name="type"
+                type="text"
                 component={renderTypeRadioField}
               />
             </Grid>
@@ -1174,6 +1175,7 @@ function VendorEditForm(props) {
                     label=""
                     id="locationCountry"
                     name="locationCountry"
+                    type="text"
                     component={renderVendorLocationCountryField}
                   />
                 </Grid>
@@ -1182,6 +1184,7 @@ function VendorEditForm(props) {
                     label=""
                     id="locationState"
                     name="locationState"
+                    type="text"
                     component={renderVendorLocationStateField}
                   />
                 </Grid>
@@ -1191,6 +1194,7 @@ function VendorEditForm(props) {
                     label=""
                     id="locationCity"
                     name="locationCity"
+                    type="text"
                     component={renderVendorLocationCityField}
                   />
                 </Grid>
@@ -1200,6 +1204,7 @@ function VendorEditForm(props) {
                   label=""
                   id="contactPersonName"
                   name="contactPersonName"
+                  type="text"
                   component={renderVendorContactNameField}
                 />
               </Grid>
@@ -1209,6 +1214,7 @@ function VendorEditForm(props) {
                     label=""
                     id="contactPersonPhoneNumber"
                     name="contactPersonPhoneNumber"
+                    type="text"
                     component={renderVendorPhoneNumberField}
                   />
                 </Grid>
@@ -1234,6 +1240,7 @@ function VendorEditForm(props) {
                   label=""
                   id="bankAccountType"
                   name="bankAccountType"
+                  type="text"
                   component={renderBankAccountTypeField}
                   className={classes.dropDown}
                 />
@@ -1243,7 +1250,7 @@ function VendorEditForm(props) {
                   label=""
                   id="bankAccountNumber"
                   name="bankAccountNumber"
-                  type="number"
+                  type="text"
                   component={renderBankAccountNumberField}
                 />
               </Grid>
@@ -1263,6 +1270,7 @@ function VendorEditForm(props) {
                   label=""
                   id="bankCountry"
                   name="bankCountry"
+                  type="text"
                   component={renderBankCountryField}
                 />
               </Grid>

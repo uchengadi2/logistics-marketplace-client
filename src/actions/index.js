@@ -49,6 +49,7 @@ import {
   FETCH_PAYMENT,
   DELETE_PAYMENT,
   EDIT_PAYMENT,
+  BOOK_PAYMENT,
   PROCESS_REMITTANCE,
   FETCH_REMITTANCES,
   FETCH_REMITTANCE,
@@ -152,13 +153,9 @@ export const signIn = (formValues) => {
 //category resources crud operations
 export const createCategory = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
   return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    console.log("the user id id:", userId);
-    const response = await data.post("/categories", {
-      ...formValues,
-      userId,
-    });
+    const response = await data.post("/categories", formValues);
 
     dispatch({ type: CREATE_CATEGORY, payload: response.data.data.data });
   };
@@ -201,16 +198,11 @@ export const deleteCategory = (id, token) => {
 //user resource crud operation
 export const createUser = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/users", {
-      ...formValues,
-      userId,
-    });
+  return async (dispatch) => {
+    const response = await data.post("/users", formValues);
 
     //console.log(response);
-    dispatch({ type: CREATE_USER, payload: response.data });
-    history.push("/users");
+    dispatch({ type: CREATE_USER, payload: response.data.data.data });
   };
 };
 
@@ -227,7 +219,7 @@ export const fetchUser = (id, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   return async (dispatch) => {
     const response = await data.get(`/users/${id}`);
-    dispatch({ type: FETCH_USER, payload: response.data });
+    dispatch({ type: FETCH_USER, payload: response.data.data.data });
   };
 };
 
@@ -254,16 +246,11 @@ export const deleteUser = (id, token) => {
 //city resource crud operation
 export const createCity = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/cities", {
-      ...formValues,
-      userId,
-    });
+  return async (dispatch) => {
+    const response = await data.post("/cities", formValues);
 
     //console.log(response);
-    dispatch({ type: CREATE_CITY, payload: response.data });
-    history.push("/cities");
+    dispatch({ type: CREATE_CITY, payload: response.data.data.data });
   };
 };
 
@@ -307,16 +294,12 @@ export const deleteCity = (id, token) => {
 //vendor resource crud operation
 export const createVendor = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/vendors", {
-      ...formValues,
-      userId,
-    });
+  return async (dispatch) => {
+    const response = await data.post("/vendors", formValues);
 
     //console.log(response);
-    dispatch({ type: CREATE_VENDOR, payload: response.data });
-    history.push("/vendors");
+    dispatch({ type: CREATE_VENDOR, payload: response.data.data.data });
+    //history.push("/vendors");
   };
 };
 
@@ -361,16 +344,12 @@ export const deleteVendor = (id, token) => {
 //product resource crud operation
 export const createProduct = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/products", {
-      ...formValues,
-      userId,
-    });
+  return async (dispatch) => {
+    const response = await data.post("/products", formValues);
 
     //console.log(response);
-    dispatch({ type: CREATE_PRODUCT, payload: response.data });
-    history.push("/products");
+    dispatch({ type: CREATE_PRODUCT, payload: response.data.data.data });
+    //history.push("/products");
   };
 };
 
@@ -378,7 +357,7 @@ export const fetchProducts = (tokens) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${tokens}`;
   return async (dispatch) => {
     const response = await data.get("/products");
-    console.log("the products are:", response);
+
     dispatch({ type: FETCH_PRODUCTS, payload: response.data.data.data });
   };
 };
@@ -466,15 +445,10 @@ export const deletePolicy = (id, token) => {
 //order resource crud operation
 export const createOrder = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/orders", {
-      ...formValues,
-      userId,
-    });
+  return async (dispatch) => {
+    const response = await data.post("/orders", formValues);
 
-    //console.log(response);
-    dispatch({ type: CREATE_ORDER, payload: response.data });
+    dispatch({ type: CREATE_ORDER, payload: response.data.data.data });
     // history.push("/orders");
   };
 };
@@ -561,15 +535,13 @@ export const assignOrder = (id, formValues, token) => {
 //payment resource crud operation
 export const makePayment = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/payments", {
-      ...formValues,
-      userId,
-    });
+  console.log("thsi is formvalues at index.js:", formValues);
+  return async (dispatch) => {
+    const response = await data.post("/payments", formValues);
+    console.log("this is payment response:", response);
 
     //console.log(response);
-    dispatch({ type: MAKE_PAYMENT, payload: response.data });
+    dispatch({ type: MAKE_PAYMENT, payload: response.data.data.data });
     //history.push("/payments");
   };
 };
@@ -598,7 +570,7 @@ export const editPayment = (id, formValues, token) => {
   return async (dispatch) => {
     const response = await data.patch(`/payments/${id}`, formValues);
     dispatch({ type: EDIT_PAYMENT, payload: response.data });
-    history.push("/payments");
+    //history.push("/payments");
   };
 };
 
@@ -610,6 +582,16 @@ export const deletePayment = (id, token) => {
     await data.delete(`/payments/${id}`);
     dispatch({ type: DELETE_PAYMENT, payload: id });
     history.push("/payments");
+  };
+};
+
+export const bookPayment = (id, formValues, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.patch(`/payments/${id}`, formValues);
+    console.log("thsi ss the response after te update:", response);
+    dispatch({ type: BOOK_PAYMENT, payload: response.data.data.data });
+    //history.push("/payments");
   };
 };
 
@@ -671,13 +653,9 @@ export const deleteRemittance = (id, token) => {
 
 export const createCountry = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    console.log("the user id id:", userId);
-    console.log("tis is the formvalues at index.js:", formValues);
-    const response = await data.post("/countries", formValues);
-    console.log("this is the response after createtio at index.js:", response);
 
+  return async (dispatch, getState) => {
+    const response = await data.post("/countries", formValues);
     dispatch({ type: CREATE_COUNTRY, payload: response.data.data.data });
   };
 };
@@ -722,15 +700,15 @@ export const deleteCountry = (id, token) => {
 
 export const createState = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/states", {
-      ...formValues,
-      userId,
-    });
+  console.log("this is the token at indexjs:", token);
+  console.log("this is the form data at inexjs:", formValues);
+  return async (dispatch) => {
+    const response = await data.post("/states", formValues);
+
+    console.log("tyhis is the response:", response);
 
     //console.log(response);
-    dispatch({ type: CREATE_STATE, payload: response.data });
+    dispatch({ type: CREATE_STATE, payload: response.data.data.data });
     history.push("/utilities/states");
   };
 };
@@ -776,16 +754,14 @@ export const deleteState = (id, token) => {
 
 export const createCurrency = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/currencies", {
-      ...formValues,
-      userId,
-    });
+  console.log("thsi is te token at indexjs:", token);
+  return async (dispatch) => {
+    const response = await data.post("/currencies", formValues);
+    console.log("currency responxe at indexjs:", response);
 
     //console.log(response);
-    dispatch({ type: CREATE_CURRENCY, payload: response.data });
-    history.push("/utilities/currencies");
+    dispatch({ type: CREATE_CURRENCY, payload: response.data.data.data });
+    //history.push("/utilities/currencies");
   };
 };
 
@@ -830,16 +806,11 @@ export const deleteCurrency = (id, token) => {
 
 export const createCluster = (formValues, token) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  return async (dispatch, getState) => {
-    const { userId } = getState().auth;
-    const response = await data.post("/clusters", {
-      ...formValues,
-      userId,
-    });
 
-    //console.log(response);
-    dispatch({ type: CREATE_CLUSTER, payload: response.data });
-    history.push("/utilities/clusters");
+  return async (dispatch) => {
+    const response = await data.post("/clusters", formValues);
+
+    dispatch({ type: CREATE_CLUSTER, payload: response.data.data.data });
   };
 };
 

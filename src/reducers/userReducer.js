@@ -15,7 +15,11 @@ export default (state = {}, action) => {
     case FETCH_USER:
       return { ...state, [action.payload.id]: action.payload };
     case CREATE_USER:
-      return { ...state, [action.payload.id]: action.payload };
+      console.log("thi is the action:", action);
+      return {
+        ...state,
+        [action.payload.id]: action.payload,
+      };
     case EDIT_USER:
       return { ...state, [action.payload.id]: action.payload };
     case DELETE_USER:

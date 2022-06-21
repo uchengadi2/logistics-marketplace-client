@@ -15,6 +15,7 @@ import CountryVendorSelectField from "./CountryVendorSelectFields";
 import data from "./../../apis/local";
 import VendorSelectFilter from "./filters/VendorSelectFilter";
 import PaymentForVendorList from "./../payments/PaymentForVendorList";
+import AddPaymentFormContainer from "../payments/AddPaymentFormContainer";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,6 +42,24 @@ const useStyles = makeStyles((theme) => ({
     height: 30,
     width: 220,
     marginLeft: 10,
+    marginTop: 2,
+    marginBottom: 5,
+    fontSize: "0.75rem",
+    backgroundColor: theme.palette.common.orange,
+    color: "white",
+    "&:hover": {
+      backgroundColor: theme.palette.common.grey,
+    },
+    [theme.breakpoints.down("sm")]: {
+      height: 40,
+      width: 225,
+    },
+  },
+  addProcessPaymentButton: {
+    borderRadius: 10,
+    height: 30,
+    width: 170,
+    marginLeft: 20,
     marginTop: 2,
     marginBottom: 5,
     fontSize: "0.75rem",
@@ -114,6 +133,7 @@ function PaymentPendingLayout(props) {
       return (
         <PaymentsList
           token={props.token}
+          userId={props.userId}
           status={status}
           selectedVendor={selectedVendor}
         />
@@ -122,6 +142,7 @@ function PaymentPendingLayout(props) {
       return (
         <PaymentForVendorList
           token={props.token}
+          userId={props.userId}
           status={status}
           selectedVendor={selectedVendor}
         />
@@ -142,21 +163,43 @@ function PaymentPendingLayout(props) {
         <Grid item className={classes.selectField}>
           <VendorSelectFilter
             token={props.token}
+            userId={props.userId}
             vendorList={vendorList}
             selectedVendor={selectedVendor}
             handleVendorChange={handleVendorChange}
           />
         </Grid>
-        <Grid item className={classes.headerContainer}>
-          <Toolbar disableGutters className={classes.toolbar}>
-            <Button
-              variant="contained"
-              className={classes.addButton}
-              onClick={() => [setOpen(true), history.push("/payments/new")]}
-            >
-              Process Payment Agreement
-            </Button>
-          </Toolbar>
+        <Grid
+          item
+          container
+          direction="row"
+          className={classes.headerContainer}
+        >
+          <Grid item>
+            <Toolbar disableGutters className={classes.toolbar}>
+              <Button
+                variant="contained"
+                className={classes.addButton}
+                onClick={() => [setOpen(true), history.push("/payments/new")]}
+              >
+                Process Payment Agreement
+              </Button>
+            </Toolbar>
+          </Grid>
+          <Grid item>
+            <Toolbar disableGutters className={classes.toolbar}>
+              {/* <Button
+                variant="contained"
+                className={classes.addProcessPaymentButton}
+                onClick={() => [
+                  setOpen(true),
+                  history.push("/payments/payments"),
+                ]}
+              >
+                Process Payment
+              </Button> */}
+            </Toolbar>
+          </Grid>
         </Grid>
         <Grid item className={classes.contentContainer}>
           {renderDataList()}
@@ -170,8 +213,9 @@ function PaymentPendingLayout(props) {
         onClose={() => [setOpen(false), history.push("/payments")]}
       >
         <DialogContent>
-          <AddPaymentForm
+          <AddPaymentFormContainer
             token={props.token}
+            userId={props.userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />
         </DialogContent>

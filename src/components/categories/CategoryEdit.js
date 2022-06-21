@@ -20,6 +20,7 @@ class CategoryEdit extends React.Component {
       <>
         <CategoryEditForm
           token={this.props.token}
+          userId={this.props.userId}
           params={this.props.params}
           handleEditDialogOpenStatus={this.props.handleEditDialogOpenStatus}
           onSubmit={this.onSubmit}

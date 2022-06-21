@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
 import Typography from "@material-ui/core/Typography";
 import history from "../../history";
@@ -10,12 +11,14 @@ import { fetchPayments } from "../../actions";
 import DataGridContainer from "../DataGridContainer";
 import PaymentEdit from "./PaymentEdit";
 import PaymentDelete from "./PaymentDelete";
+import PaymentBooking from "./PaymentBooking";
 
 class PaymentList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       editOpen: false,
+      paymentOpen: false,
       deleteOpen: false,
       id: null,
       params: {},
@@ -35,6 +38,11 @@ class PaymentList extends React.Component {
     this.setState({ editOpen: false });
   };
 
+  handleBookPaymentDialogOpenStatus = () => {
+    // history.push("/categories/new");
+    this.setState({ paymentOpen: false });
+  };
+
   renderEditDialogForm = () => {
     //token will be used here
     return (
@@ -52,6 +60,32 @@ class PaymentList extends React.Component {
               token={this.props.token}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
+            />
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  };
+
+  renderPaymentDialogForm = () => {
+    //token will be used here
+    return (
+      <>
+        <Dialog
+          //style={{ zIndex: 1302 }}
+          open={this.state.paymentOpen}
+          onClose={() => [
+            this.setState({ paymentOpen: false }),
+            history.push("/payments"),
+          ]}
+        >
+          <DialogContent>
+            <PaymentBooking
+              token={this.props.token}
+              params={this.state.params}
+              handleBookPaymentDialogOpenStatus={
+                this.handleBookPaymentDialogOpenStatus
+              }
             />
           </DialogContent>
         </Dialog>
@@ -89,7 +123,6 @@ class PaymentList extends React.Component {
       { field: "numbering", headerName: "S/n", width: 100 },
       { field: "orderNumber", headerName: "Order Number", width: 200 },
       { field: "paymentStatus", headerName: "Payment Status", width: 200 },
-      { field: "vendor", headerName: "Vendor", width: 200 },
       { field: "customer", headerName: "Customer", width: 200 },
       {
         field: "totalAmountExpected",
@@ -133,6 +166,27 @@ class PaymentList extends React.Component {
         ),
       },
       {
+        field: "bookpaymentaction",
+        headerName: "",
+        width: 30,
+        description: "Update payment",
+        renderCell: (params) => (
+          <strong>
+            {/* {params.value.getFullYear()} */}
+            <AttachMoneyIcon
+              onClick={() => [
+                this.setState({
+                  paymentOpen: true,
+                  id: params.id,
+                  params: params.row,
+                }),
+                history.push(`/payments/bookings/${params.id}`),
+              ]}
+            />
+          </strong>
+        ),
+      },
+      {
         field: "deleteaction",
         headerName: "",
         width: 30,
@@ -155,9 +209,9 @@ class PaymentList extends React.Component {
       let row = {
         numbering: ++counter,
         id: payment.id,
-        orderNumber: payment.order[0],
-        vendor: payment.vendor[0],
-        customer: payment.customer[0],
+        orderNumber: payment.order,
+        vendor: payment.vendor,
+        customer: payment.customer,
         totalAmountExpected: payment.totalAmountExpected,
         totalAmountAlreadyPaid: payment.totalAmountAlreadyPaid,
         lastPaymentAmountMade: payment.lastPaymentAmountMade,
@@ -168,6 +222,9 @@ class PaymentList extends React.Component {
         agreedPaymentCurrency: payment.agreedPaymentCurrency,
         preferredPaymentCurrency: payment.preferredPaymentCurrency,
         paymentStatus: payment.paymentStatus,
+        percentageForInitialPayment: payment.percentageForInitialPayment,
+        percentageForSecondPayment: payment.percentageForSecondPayment,
+        percentageForThirdPayment: payment.percentageForThirdPayment,
         initialPaymentAmountExpected:
           payment.paymentBreakdown.initialPaymentInstallment
             .initialPaymentAmountExpected,
@@ -214,6 +271,7 @@ class PaymentList extends React.Component {
         {this.renderDeleteDialogForm()}
         {this.renderEditDialogForm()}
         {this.renderPaymentsList()}
+        {this.renderPaymentDialogForm()}
       </>
     );
   }

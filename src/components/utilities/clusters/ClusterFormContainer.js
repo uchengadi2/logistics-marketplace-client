@@ -11,19 +11,17 @@ class ClusterFormContainer extends React.Component {
     };
   }
   componentDidMount() {
-    console.log("a;; the props are:", this.props);
+    
   }
 
   onSubmit = (formValues) => {
     this.props.createCluster(formValues, this.props.token);
     this.props.handleDialogOpenStatus();
-
-    console.log("the form values areeeee:", formValues);
   };
   render() {
     return (
       <>
-        <ClusterForm onSubmit={this.onSubmit} />
+        <ClusterForm onSubmit={this.onSubmit} userId={this.props.userId} />
       </>
     );
   }

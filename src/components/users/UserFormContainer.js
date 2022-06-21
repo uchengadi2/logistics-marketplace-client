@@ -31,4 +31,10 @@ class UserFormContainer extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => {
+  console.log("this is the user state:", state.user);
+  return { user: state.user };
+  return null;
+};
+
 export default connect(null, { createUser })(UserFormContainer);

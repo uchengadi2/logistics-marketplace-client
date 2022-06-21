@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function StateLayout({ token }) {
+function StateLayout({ token, userId }) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -97,7 +97,7 @@ function StateLayout({ token }) {
           </Toolbar>
         </Grid>
         <Grid item className={classes.contentContainer}>
-          <StateList token={token} />
+          <StateList token={token} userId={userId} />
         </Grid>
       </Grid>
       <Dialog
@@ -109,6 +109,7 @@ function StateLayout({ token }) {
         <DialogContent>
           <StateFormContainer
             token={token}
+            userId={userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />
         </DialogContent>

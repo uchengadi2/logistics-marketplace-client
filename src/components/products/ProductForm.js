@@ -180,6 +180,7 @@ function ProductForm(props) {
             onChange={handleVendorChange}
             label="Vendor"
             style={{ width: 500, marginTop: 10 }}
+            {...input}
           >
             {renderVendorList()}
           </Select>
@@ -208,6 +209,7 @@ function ProductForm(props) {
             onChange={handleCategoryChange}
             label="Category"
             style={{ marginTop: 20, width: 500 }}
+            {...input}
           >
             {renderCategoryList()}
           </Select>
@@ -237,6 +239,7 @@ function ProductForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -263,6 +266,7 @@ function ProductForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -292,6 +296,7 @@ function ProductForm(props) {
         multiline={true}
         minRows={4}
         {...custom}
+        {...input}
         // onChange={handleInput}
       />
     );
@@ -320,6 +325,7 @@ function ProductForm(props) {
         multiline={true}
         minRows={12}
         {...custom}
+        {...input}
         // onChange={handleInput}
       />
     );
@@ -347,6 +353,7 @@ function ProductForm(props) {
         style={{ marginTop: 20 }}
         multiline={true}
         minRows={4}
+        {...input}
         {...custom}
         // onChange={handleInput}
       />
@@ -372,6 +379,7 @@ function ProductForm(props) {
             onChange={handleCityChange}
             label="City"
             style={{ marginTop: 20, width: 500 }}
+            {...input}
           >
             {renderCityList()}
           </Select>
@@ -403,6 +411,7 @@ function ProductForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -429,6 +438,7 @@ function ProductForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -455,6 +465,7 @@ function ProductForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -481,6 +492,7 @@ function ProductForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
@@ -507,13 +519,14 @@ function ProductForm(props) {
         //required
         type={type}
         {...custom}
+        {...input}
 
         //onChange={handleInput}
       />
     );
   };
 
-  const renderImageField = ({
+  const renderImageCoverField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -521,6 +534,7 @@ function ProductForm(props) {
     id,
     ...custom
   }) => {
+    delete input.value;
     return (
       <TextField
         id={input.name}
@@ -529,14 +543,63 @@ function ProductForm(props) {
         name={input.name}
         fullWidth
         style={{ marginTop: 20 }}
-        onChange={onImageChange}
-        helperText="Upload Vehicle Image"
+        //onChange={onImageChange}
+        helperText="Upload Vehicle Image Cover"
+        {...input}
+      />
+    );
+  };
+
+  const renderProductImagesField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    delete input.value;
+    return (
+      <TextField
+        id={input.name}
+        variant="outlined"
+        type={type}
+        name={input.name}
+        fullWidth
+        style={{ marginTop: 20 }}
+        //onChange={onImageChange}
+        helperText="Upload This Vehicle Other Images (maximum of 5)"
+        {...input}
+        inputProps={{ multiple: true }}
       />
     );
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    const form = new FormData();
+    form.append("name", formValues.name);
+    form.append("shortDescription", formValues.shortDescription);
+    form.append("fullDescription", formValues.fullDescription);
+    form.append("plateNumber", formValues.plateNumber);
+    form.append("category", formValues.category);
+    form.append("vendor", formValues.vendor);
+    form.append("createdBy", props.userId);
+    form.append("features.make", formValues.make);
+    form.append("features.model", formValues.model);
+    form.append("features.chassis", formValues.chassis);
+
+    form.append(
+      "permanentLocation.permanentLocationAddress",
+      formValues.permanentLocationAddress
+    );
+
+    form.append("permanentLocation.city", formValues.city);
+
+    if (formValues.imageCover) {
+      form.append("imageCover", formValues.imageCover[0]);
+    }
+
+    props.onSubmit(form);
   };
 
   return (
@@ -547,7 +610,7 @@ function ProductForm(props) {
             style={{ color: "blue", fontSize: "1.5em" }}
             component="legend"
           >
-            Enter Vehicle Details
+            <Typography variant="h5">Enter Vehicle Details</Typography>
           </FormLabel>
         </Grid>
         <Box
@@ -625,7 +688,7 @@ function ProductForm(props) {
             type="text"
             component={renderLocationCityField}
           />
-          <Grid container direction="row" style={{ marginTop: 20 }}>
+          {/* <Grid container direction="row" style={{ marginTop: 20 }}>
             <Grid item>
               <Field
                 label=""
@@ -646,7 +709,7 @@ function ProductForm(props) {
                 style={{ width: 250, marginLeft: 30 }}
               />
             </Grid>
-          </Grid>
+          </Grid> */}
           <Grid container direction="row" style={{ marginTop: 20 }}>
             <Grid item style={{ width: "30%" }}>
               <Field
@@ -676,7 +739,18 @@ function ProductForm(props) {
               />
             </Grid>
           </Grid>
-          <Field name="image" type="file" component={renderImageField} />
+          <Field
+            name="imageCover"
+            type="file"
+            accept="image/*"
+            component={renderImageCoverField}
+          />
+          {/* <Field
+            name="images"
+            type="file"
+            accept="image/*"
+            component={renderProductImagesField}
+          /> */}
           <Button
             variant="contained"
             className={classes.submitButton}

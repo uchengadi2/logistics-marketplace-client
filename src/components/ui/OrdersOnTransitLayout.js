@@ -295,13 +295,13 @@ function OrdersOnTransitLayout(props) {
         >
           <Toolbar disableGutters className={classes.toolbar}>
             <Grid item>
-              <Button
+              {/* <Button
                 variant="contained"
                 className={classes.addButton}
                 onClick={() => [setOpen(true), history.push("/orders/new")]}
               >
                 Add Order
-              </Button>
+              </Button> */}
             </Grid>
             <Grid item></Grid>
           </Toolbar>

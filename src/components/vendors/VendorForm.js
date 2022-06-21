@@ -17,20 +17,28 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import CircularProgress from "@material-ui/core/CircularProgress";
+
 import data from "./../../apis/local";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: 10,
+    marginTop: 20,
   },
   formStyles: {
-    width: 600,
+    width: 550,
   },
+  formControl: {
+    //margin: theme.spacing(1),
+    minWidth: 150,
+    marginTop: 20,
+  },
+
   submitButton: {
     borderRadius: 10,
     height: 40,
     width: 150,
-    marginLeft: 180,
+    marginLeft: 200,
     marginTop: 20,
     marginBottom: 20,
     color: "white",
@@ -41,84 +49,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function OrderForm(props) {
+function VendorForm(props) {
   const classes = useStyles();
-  const [quantity, setQuantity] = useState("");
-  const [country, setCountry] = useState("");
-  const [customer, setCustomer] = useState();
-  const [category, setCategory] = useState();
-  const [consignmentLocation, setConsignmentLocation] = useState();
-  const [consignmentSourceCity, setConsignmentSourceCity] = useState();
-  const [consignmentSourceState, setConsignmentSourceState] = useState();
-  const [consignmentSourceCountry, setConsignmentSourceCountry] = useState();
-  const [consignmentDestinationCity, setConsignmentDestinationCity] =
-    useState();
-  const [consignmentDestinationState, setConsignmentDestinationState] =
-    useState();
-  const [consignmentDestinationCountry, setConsignmentDestinationCountry] =
-    useState();
-  const [logisticsInsuranceType, setLogisticsInsuranceType] = useState();
-  const [customerList, setCustomerList] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
+  const [locationCity, setLocationCity] = useState("");
+  const [locationState, setLocationState] = useState("");
+  const [locationCountry, setLocationCountry] = useState("");
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [countryStateList, setCountryStateList] = useState([]);
+  const [stateCityList, setStateCityList] = useState([]);
+  const [bankCountry, setBankCountry] = useState("");
+  const [cityList, setCityList] = useState([]);
+  const [stateList, setStateList] = useState([]);
+  const [countryList, setCountryList] = useState([]);
+  const [bankAccountType, setBankAccountType] = useState();
+  const [vendorType, setVendorType] = useState();
+  const [
+    enforceGlobalPlatformPolicyContract,
+    setEnforceGlobalPlatformPolicyContract,
+  ] = useState("true");
+  const [
+    permittableMaximumNumberOfPaymentInstallments,
+    setPermittableMaximumNumberOfPaymentInstallments,
+  ] = useState("1");
+  const [loading, setLoading] = useState(false);
 
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
-  };
-
-  const handleConsignmentLocationChange = (event) => {
-    setConsignmentLocation(event.target.value);
-  };
-
-  const handleCountryChange = (event) => {
-    setCountry(event.target.value);
-  };
-
-  const handleCustomerChange = (event) => {
-    setCustomer(event.target.value);
-  };
-
-  const handleCategoryChange = (event) => {
-    setCategory(event.target.value);
-  };
-
-  const handleConsignmentSourceCityChange = (event) => {
-    setConsignmentSourceCity(event.target.value);
-  };
-
-  const handleConsignmentSourceStateChange = (event) => {
-    setConsignmentSourceState(event.target.value);
-  };
-
-  const handleConsignmentSourceCountryChange = (event) => {
-    setConsignmentSourceCountry(event.target.value);
-  };
-
-  const handleConsignmentDestinationCityChange = (event) => {
-    setConsignmentDestinationCity(event.target.value);
-  };
-
-  const handleConsignmentDestinationStateChange = (event) => {
-    setConsignmentDestinationState(event.target.value);
-  };
-
-  const handleConsignmentDestinationCountryChange = (event) => {
-    setConsignmentDestinationCountry(event.target.value);
-  };
-
-  const handleLogisticsInsuranceTypeChange = (event) => {
-    setLogisticsInsuranceType(event.target.value);
-  };
+  //spool the vendor document & data
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
       data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/users");
+      const response = await data.get("/countries");
       const workingData = response.data.data.data;
-      workingData.map((user) => {
-        allData.push({ id: user._id, name: user.name });
+      workingData.map((country) => {
+        allData.push({ id: country._id, name: country.name });
       });
-      setCustomerList(allData);
+      setCountryList(allData);
     };
 
     //call the function
@@ -130,12 +97,13 @@ function OrderForm(props) {
     const fetchData = async () => {
       let allData = [];
       data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/categories");
+      const response = await data.get("/states");
+
       const workingData = response.data.data.data;
-      workingData.map((category) => {
-        allData.push({ id: category._id, name: category.name });
+      workingData.map((state) => {
+        allData.push({ id: state._id, name: state.name });
       });
-      setCategoryList(allData);
+      setStateList(allData);
     };
 
     //call the function
@@ -143,73 +111,105 @@ function OrderForm(props) {
     fetchData().catch(console.error);
   }, []);
 
-  const renderSelectNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="customer"
-            id="customer"
-            value={customer}
-            onChange={handleCustomerChange}
-            label="Customer"
-            style={{ marginTop: 10, width: 500 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"nigeria"}>Nigeria</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select User/Customer Name</FormHelperText>
-        </FormControl>
-      </Box>
-    );
+  useEffect(() => {
+    const fetchData = async () => {
+      let allData = [];
+      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await data.get("/cities");
+      const workingData = response.data.data.data;
+      workingData.map((city) => {
+        allData.push({ id: city._id, name: city.name });
+      });
+      setCityList(allData);
+    };
+
+    //call the function
+
+    fetchData().catch(console.error);
+  }, []);
+
+  const handleVendorTypeChange = (event) => {
+    setVendorType(event.target.value);
   };
 
-  const renderCategoryField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="category"
-            id="category"
-            value={category}
-            onChange={handleCategoryChange}
-            label="Category"
-            style={{ marginTop: 10, width: 500 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"nigeria"}>Nigeria</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select Vehicle Category</FormHelperText>
-        </FormControl>
-      </Box>
-    );
+  const handleLocationCityChange = (event) => {
+    setLocationCity(event.target.value);
   };
 
-  const renderVehicleQuantityField = ({
+  const handleLocationStateChange = (event) => {
+    setLocationState(event.target.value);
+    setCityList([]);
+  };
+
+  const handleLocationCountryChange = (event) => {
+    setLocationCountry(event.target.value);
+    setStateList([]);
+    setCityList([]);
+  };
+
+  const handleAccountTypeChange = (event) => {
+    setBankAccountType(event.target.value);
+  };
+
+  const handleBankCountryChange = (event) => {
+    setBankCountry(event.target.value);
+  };
+
+  const handleGlobalPolicyChange = (event) => {
+    setEnforceGlobalPlatformPolicyContract(event.target.value);
+  };
+
+  const handleMaximumPaymentInstallmentChange = (event) => {
+    setPermittableMaximumNumberOfPaymentInstallments(event.target.value);
+  };
+
+  // const newParams = Object.values(params);
+  // const contactPersonName = ((params || {}).contactPerson || {})
+  //   .contactPersonName;
+
+  // const percentageAmountForThirdInstallmentPayment = (
+  //   (params || {}).contract ||
+  //   {}.thirdPaymentInstallment ||
+  //   {}
+  // ).percentageAmountForThirdInstallmentPayment;
+
+  console.log("this is the selected location country:", locationCountry);
+
+  console.log("this is th countrylist:", countryList);
+  //get the city list
+  const renderCityList = () => {
+    return cityList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
+  };
+
+  //get the state list
+  const renderStateList = () => {
+    return stateList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
+  };
+
+  //get the country list
+  const renderCountryList = () => {
+    return countryList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
+  };
+
+  const renderNameField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -220,11 +220,11 @@ function OrderForm(props) {
     return (
       <TextField
         //error={touched && invalid}
-        helperText="Enter the number of vehicle(s) you need under this category"
+        helperText="Enter the name of the Vendor"
         variant="outlined"
         label={label}
         id={input.name}
-        //value={formInput.name}
+        {...input}
         fullWidth
         //required
         type={type}
@@ -235,7 +235,56 @@ function OrderForm(props) {
     );
   };
 
-  const renderCountryField = ({
+  const renderDescriptionField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        error={touched && invalid}
+        //placeholder="category description"
+        variant="outlined"
+        helperText="Describe the Vendor"
+        label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        type={type}
+        style={{ marginTop: 20 }}
+        multiline={true}
+        minRows={8}
+        {...custom}
+        // onChange={handleInput}
+      />
+    );
+  };
+
+  const renderImageField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        id={input.name}
+        variant="outlined"
+        type={type}
+        fullWidth
+        {...input}
+        style={{ marginTop: 20 }}
+        helperText="Upload Category Image"
+      />
+    );
+  };
+
+  const renderTypeRadioField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -245,30 +294,152 @@ function OrderForm(props) {
   }) => {
     return (
       <Box>
-        <FormControl variant="outlined">
+        <FormControl component="fieldset">
+          <FormLabel style={{ color: "blue" }} component="legend">
+            Vendor Type
+          </FormLabel>
+          <RadioGroup
+            aria-label="type"
+            name="type"
+            value={vendorType}
+            onChange={handleVendorTypeChange}
+            {...input}
+          >
+            <Grid item container direction="row">
+              <Grid item>
+                <FormControlLabel
+                  value="corporate"
+                  control={<Radio />}
+                  label="Corporate"
+                />
+              </Grid>
+
+              <Grid item></Grid>
+              <FormControlLabel
+                value="individual"
+                control={<Radio />}
+                label="individual"
+              />
+            </Grid>
+          </RadioGroup>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const renderVendorAddressField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Enter the Vendor Address Location"
+        variant="outlined"
+        label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        multiline={true}
+        minRows={2}
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderVendorLocationCityField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl variant="outlined" className={classes.formControl}>
           {/* <InputLabel id="vendor_city">City</InputLabel> */}
           <Select
-            labelId="country"
-            id="country"
-            value={country}
-            onChange={handleCountryChange}
+            labelId="city"
+            id="city"
+            value={locationCity}
+            onChange={handleLocationCityChange}
+            label="City"
+            {...input}
+          >
+            {renderCityList()}
+          </Select>
+          <FormHelperText>Select City</FormHelperText>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const renderVendorLocationStateField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl variant="outlined" className={classes.formControl}>
+          {/* <InputLabel id="vendor_city">City</InputLabel> */}
+          <Select
+            labelId="locationState"
+            id="locationState"
+            value={locationState}
+            onChange={handleLocationStateChange}
+            label="State"
+            {...input}
+          >
+            {renderStateList()}
+          </Select>
+          <FormHelperText>Select State/Region/Province</FormHelperText>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const renderVendorLocationCountryField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl variant="outlined" className={classes.formControl}>
+          {/* <InputLabel id="vendor_city">City</InputLabel> */}
+          <Select
+            labelId="locationCountry"
+            id="locationCountry"
+            value={locationCountry}
+            onChange={handleLocationCountryChange}
             label="Country"
-            style={{ marginTop: 10, width: 500 }}
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"nigeria"}>Nigeria</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
+            {renderCountryList()}
           </Select>
-          <FormHelperText>Select Country where city is located</FormHelperText>
+          <FormHelperText>Select Country</FormHelperText>
         </FormControl>
       </Box>
     );
   };
 
-  const renderConsignmentLocationAddressField = ({
+  const renderVendorContactNameField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -278,25 +449,23 @@ function OrderForm(props) {
   }) => {
     return (
       <TextField
-        error={touched && invalid}
-        //placeholder="category description"
+        //error={touched && invalid}
+        helperText="Enter the contact Person's Name"
         variant="outlined"
-        helperText="Enter the source address of this consignment"
         label={label}
         id={input.name}
-        // value={formInput.description}
+        {...input}
         fullWidth
+        //required
         type={type}
-        style={{ marginTop: 10 }}
-        multiline={true}
-        minRows={3}
         {...custom}
-        // onChange={handleInput}
+
+        //onChange={handleInput}
       />
     );
   };
 
-  const renderConsignmentDestinationAddressField = ({
+  const renderVendorPhoneNumberField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -306,238 +475,12 @@ function OrderForm(props) {
   }) => {
     return (
       <TextField
-        error={touched && invalid}
-        //placeholder="category description"
+        //error={touched && invalid}
+        helperText="Enter the contact person's phone numbers"
         variant="outlined"
-        helperText="Enter the destination address of this consignment"
         label={label}
         id={input.name}
-        // value={formInput.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 10 }}
-        multiline={true}
-        minRows={3}
-        {...custom}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentSourceCityField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="consignmentsourcecity"
-            id="consignmentsourcecity"
-            value={consignmentSourceCity}
-            onChange={handleConsignmentSourceCityChange}
-            label="Consignment Source City"
-            style={{ width: 150 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"ikeja"}>Ikeja</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select the Source City </FormHelperText>
-        </FormControl>
-      </Box>
-    );
-  };
-
-  const renderConsignmentDestinationCityField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="consignmentdestinationcity"
-            id="consignmentdestinationcity"
-            value={consignmentDestinationCity}
-            onChange={handleConsignmentDestinationCityChange}
-            label="Consignment Destination City"
-            style={{ width: 150 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"ikeja"}>Ikeja</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select Destination City </FormHelperText>
-        </FormControl>
-      </Box>
-    );
-  };
-
-  const renderConsignmentSourceStateField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="consignmentcourcestate"
-            id="consignmentsourcestate"
-            value={consignmentSourceState}
-            onChange={handleConsignmentSourceStateChange}
-            label="Consignment Source State"
-            style={{ width: 150 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"ikeja"}>Ikeja</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select the Source State </FormHelperText>
-        </FormControl>
-      </Box>
-    );
-  };
-
-  const renderConsignmentDestinationStateField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="consignmentdestinationstate"
-            id="consignmentdestinationstate"
-            value={consignmentDestinationState}
-            onChange={handleConsignmentDestinationStateChange}
-            label="Consignment Destination State"
-            style={{ width: 150 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"ikeja"}>Ikeja</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select Destination State </FormHelperText>
-        </FormControl>
-      </Box>
-    );
-  };
-
-  const renderConsignmentSourceCountryField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="consignmentsourcecountry"
-            id="consignmentsourcecountry"
-            value={consignmentSourceCountry}
-            onChange={handleConsignmentSourceCountryChange}
-            label="Consignment Source Country"
-            style={{ width: 150 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"ikeja"}>Ikeja</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select Source Country </FormHelperText>
-        </FormControl>
-      </Box>
-    );
-  };
-
-  const renderConsignmentDestinationCountryField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <Box>
-        <FormControl variant="outlined">
-          {/* <InputLabel id="vendor_city">City</InputLabel> */}
-          <Select
-            labelId="consignmentdestinationcountry"
-            id="consignmentdestinationcountry"
-            value={consignmentDestinationCountry}
-            onChange={handleConsignmentDestinationCountryChange}
-            label="Consignment Destination Country"
-            style={{ width: 150 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"ikeja"}>Ikeja</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
-          </Select>
-          <FormHelperText>Select Destination Country </FormHelperText>
-        </FormControl>
-      </Box>
-    );
-  };
-
-  const renderConsignmentType = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Consignment Type(eg container etc)"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        //value={formInput.name}
+        {...input}
         fullWidth
         //required
         type={type}
@@ -548,7 +491,7 @@ function OrderForm(props) {
     );
   };
 
-  const renderWeightinKg = ({
+  const renderVendorEmailAddressField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -559,65 +502,11 @@ function OrderForm(props) {
     return (
       <TextField
         //error={touched && invalid}
-        helperText="Enter Consignment Weight(in kg)"
+        helperText="Enter the contact Person's email address"
         variant="outlined"
-        //label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Describe the consignment"
         label={label}
         id={input.name}
-        // value={formInput.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 10 }}
-        multiline={true}
-        minRows={5}
-        {...custom}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentSourceContactPerson = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Contact Person Name"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        //value={formInput.name}
+        {...input}
         fullWidth
         //required
         type={type}
@@ -628,7 +517,37 @@ function OrderForm(props) {
     );
   };
 
-  const renderConsignmentDestinationContactPerson = ({
+  const renderBankAccountTypeField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl variant="outlined" className={classes.accountType}>
+          {/* <InputLabel id="vendor_city">City</InputLabel> */}
+          <Select
+            labelId="bankAccountType"
+            id="bankAccountType"
+            value={bankAccountType}
+            onChange={handleAccountTypeChange}
+            label="Account Type"
+            {...input}
+          >
+            <MenuItem value={"savings"}>Savings</MenuItem>
+            <MenuItem value={"current"}>Current</MenuItem>
+            <MenuItem value={"domicilary"}>Domicilary</MenuItem>
+          </Select>
+          <FormHelperText>Select Account Type</FormHelperText>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const renderBankAccountNumberField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -639,11 +558,11 @@ function OrderForm(props) {
     return (
       <TextField
         //error={touched && invalid}
-        helperText="Enter Contact Person Name"
+        helperText="Enter the bank account number"
         variant="outlined"
-        //label={label}
+        label={label}
         id={input.name}
-        //value={formInput.name}
+        {...input}
         fullWidth
         //required
         type={type}
@@ -654,7 +573,7 @@ function OrderForm(props) {
     );
   };
 
-  const renderConsignmentSourceContactPhoneNumber = ({
+  const renderBankAccountNameField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -665,11 +584,11 @@ function OrderForm(props) {
     return (
       <TextField
         //error={touched && invalid}
-        helperText="Enter Contact Person Number"
+        helperText="Enter the bank account name"
         variant="outlined"
-        //label={label}
+        label={label}
         id={input.name}
-        //value={formInput.name}
+        {...input}
         fullWidth
         //required
         type={type}
@@ -680,59 +599,7 @@ function OrderForm(props) {
     );
   };
 
-  const renderConsignmentDestinationContactPhoneNumber = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Contact Person Number"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentOwnerField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the Name of the owner of this Consignment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderLogisticsInsuranceTypeField = ({
+  const renderBankCountryField = ({
     input,
     label,
     meta: { touched, error, invalid },
@@ -745,274 +612,842 @@ function OrderForm(props) {
         <FormControl variant="outlined">
           {/* <InputLabel id="vendor_city">City</InputLabel> */}
           <Select
-            labelId="logisticsinsurancettype"
-            id="logisticsinsurancettype"
-            value={logisticsInsuranceType}
-            onChange={handleLogisticsInsuranceTypeChange}
-            label="Logistics Insurance Type"
-            style={{ width: 500, marginTop: 10 }}
+            labelId="backCountry"
+            id="bankCountry"
+            value={bankCountry}
+            onChange={handleBankCountryChange}
+            label="Bank Country"
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"ikeja"}>Ikeja</MenuItem>
-            <MenuItem value={"ghana"}>Ghana</MenuItem>
-            <MenuItem value={"Togo"}>Togo</MenuItem>
+            {renderCountryList()}
           </Select>
-          <FormHelperText>Choose preferred Insurance Type </FormHelperText>
+          <FormHelperText>Select Bank Country</FormHelperText>
         </FormControl>
       </Box>
+    );
+  };
+
+  const renderBankSwiftCodeNumberField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Enter the bank Swift code"
+        variant="outlined"
+        label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderBankIBANField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Enter the bank IBAN number"
+        variant="outlined"
+        label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderBankNameField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Enter the bank name"
+        variant="outlined"
+        label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderEnforceGlobalPlatformPolicyField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">
+            Enforce Platform Global Policy Contract?
+          </FormLabel>
+          <RadioGroup
+            aria-label="enforceGlobalPlatformPolicyContract"
+            name="enforceGlobalPlatformPolicyContract"
+            value={enforceGlobalPlatformPolicyContract}
+            onChange={handleGlobalPolicyChange}
+            {...input}
+          >
+            <Grid item container direction="row">
+              <Grid item>
+                <FormControlLabel
+                  value={"true"}
+                  control={<Radio />}
+                  label="Yes"
+                />
+              </Grid>
+
+              <Grid item></Grid>
+              <FormControlLabel
+                value={"false"}
+                control={<Radio />}
+                label="No"
+              />
+            </Grid>
+          </RadioGroup>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const rendermaxNumberOfPaymentInstallmentAllowed = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">
+            Choose maximum number of payment installments
+          </FormLabel>
+          <RadioGroup
+            aria-label="permittableMaximumNumberOfPaymentInstallments"
+            name="permittableMaximumNumberOfPaymentInstallments"
+            value={permittableMaximumNumberOfPaymentInstallments}
+            onChange={handleMaximumPaymentInstallmentChange}
+            {...input}
+          >
+            <Grid item container direction="row">
+              <Grid item>
+                <FormControlLabel value={"1"} control={<Radio />} label="One" />
+              </Grid>
+
+              <Grid item>
+                <FormControlLabel value={"2"} control={<Radio />} label="Two" />
+              </Grid>
+              <Grid item>
+                <FormControlLabel
+                  value={"3"}
+                  control={<Radio />}
+                  label="Three"
+                />
+              </Grid>
+            </Grid>
+          </RadioGroup>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const renderAgreedInitialPercentagePaymentField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Enter initial % payment"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderAgreedDaysToPaymentRemittanceField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Days from payment to remittance"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderPlatformPercentageChargeField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Platform percentage charge"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderAgreedSecondPercentagePaymentField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Enter second % payment"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderAgreedSecondDaysToPaymentRemittanceField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Days from payment to remittance"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderSecondPlatformPercentageChargeField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Platform percentage charge"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderAgreedThirdPercentagePaymentField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Enter third % payment"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderAgreedThirdDaysToPaymentRemittanceField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Days from payment to remittance"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
+    );
+  };
+
+  const renderThirdPlatformPercentageChargeField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <TextField
+        //error={touched && invalid}
+        helperText="Platform percentage charge"
+        variant="outlined"
+        //label={label}
+        id={input.name}
+        {...input}
+        fullWidth
+        //required
+        type={type}
+        {...custom}
+
+        //onChange={handleInput}
+      />
     );
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    setLoading(false);
+    const data = {
+      vendorNumber: Math.floor(Math.random() * 100000000),
+      name: formValues["name"],
+      description: formValues["description"] || "",
+      type: formValues["vendorType"],
+      vendorCountry: formValues["locationCountry"],
+      location: {
+        locationAddress: formValues["locationAddress"] || "",
+        locationCity: formValues["locationCity"],
+        locationState: formValues["locationState"],
+        locationCountry: formValues["locationCountry"],
+        locationCoordinates: [],
+        officePhoneNumber: "",
+      },
+      contactPerson: {
+        contactPersonName: formValues["contactPersonName"] || "",
+        contactPersonPhoneNumber: formValues["contactPersonPhoneNumber"] || "",
+        contactPersonEmailAddress:
+          formValues["contactPersonEmailAddress"] || "",
+      },
+      bankDetails: {
+        bankName: formValues["bankName"],
+        bankAccountNumber: formValues["bankAccountNumber"],
+        bankAccountType: formValues["bankAccountType"],
+        bankAccountName: formValues["bankAccountName"],
+        bankCountry: formValues["bankCountry"],
+        bankAccountSwiftCode: formValues["bankAccountSwiftCode"] || "",
+        bankAccountIBAN: formValues["bankAccountIBAN"] || "",
+      },
+      contract: {
+        enforceGlobalPlatformPolicyContract:
+          formValues["enforceGlobalPlatformPolicyContract"],
+        permittableMaximumNumberOfPaymentInstallments:
+          formValues["permittableMaximumNumberOfPaymentInstallments"],
+        initialPaymentInstallment: {
+          initialPaymentAgreedRemittablePercentage:
+            formValues["initialPaymentAgreedRemittablePercentage"] || 0,
+          initialPaymentAgreedDaysToPaymentRemittance:
+            formValues["initialPaymentAgreedDaysToPaymentRemittance"],
+          initialPaymentPlatformPercentageForRetention:
+            formValues["initialPaymentPlatformPercentageForRetention"] || 0,
+        },
+        secondPaymentInstallment: {
+          secondPaymentAgreedRemittablePercentage:
+            formValues["secondPaymentAgreedRemittablePercentage"] || 0,
+          secondPaymentAgreedDaysToPaymentRemittance:
+            formValues["secondPaymentAgreedDaysToPaymentRemittance"],
+          secondPaymentPlatformPercentageForRetention:
+            formValues["secondPaymentPlatformPercentageForRetention"] || 0,
+        },
+        thirdPaymentInstallment: {
+          thirdPaymentAgreedRemittablePercentage:
+            formValues["thirdPaymentAgreedRemittablePercentage"] || 0,
+          thirdPaymentAgreedDaysToPaymentRemittance:
+            formValues["thirdPaymentAgreedDaysToPaymentRemittance"] || 0,
+          thirdPaymentPlatformPercentageForRetention:
+            formValues["thirdPaymentPlatformPercentageForRetention"] || 0,
+        },
+      },
+    };
+
+    props.onSubmit(data);
+    setLoading(true);
+  };
+
+  const buttonContent = () => {
+    return <React.Fragment>Submit</React.Fragment>;
   };
 
   return (
     <div className={classes.root}>
-      <Grid container justifyContent="center">
-        <FormLabel
-          style={{ color: "blue", fontSize: "1.5em" }}
-          component="legend"
-        >
-          Enter Order/Booking Details
-        </FormLabel>
-      </Grid>
-      <Box
-        component="form"
-        id="orderForm"
-        // onSubmit={onSubmit}
-        sx={{
-          width: 500,
-          height: 420,
-        }}
-        noValidate
-        autoComplete="off"
-        style={{ marginTop: 10 }}
-      >
-        <Grid container direction="row">
-          <Grid item style={{ width: "100%" }}>
-            <Field
-              label=""
-              id="name"
-              name="name"
-              type="text"
-              component={renderSelectNameField}
-            />
-          </Grid>
+      <form id="vendorCategory" className={classes.formStyles}>
+        <Grid container style={{ marginTop: 20 }} justifyContent="center">
+          <FormLabel
+            style={{ color: "blue", fontSize: "1.5em" }}
+            component="legend"
+          >
+            Vendor Details
+          </FormLabel>
         </Grid>
+        <Box
+          sx={{
+            width: 550,
+            height: 420,
+          }}
+          noValidate
+          autoComplete="off"
+        >
+          <Field
+            label=""
+            id="name"
+            name="name"
+            type="text"
+            component={renderNameField}
+            autoComplete="off"
+            style={{ marginTop: 20 }}
+          />
 
-        <Field
-          label=""
-          id="category"
-          name="category"
-          type="text"
-          component={renderCategoryField}
-          style={{ marginTop: 10 }}
-        />
+          <Field
+            label=""
+            id="description"
+            name="description"
+            type="text"
+            component={renderDescriptionField}
+          />
 
-        <Field
-          label=""
-          id="quantity"
-          name="quantity"
-          type="number"
-          component={renderVehicleQuantityField}
-          style={{ marginTop: 10 }}
-        />
-        <FormLabel
-          style={{ color: "blue", marginTop: 10, fontSize: "1.2em" }}
-          component="legend"
-        >
-          Enter Consignment Details
-        </FormLabel>
-        <Field
-          label=""
-          id="consignmentOwner"
-          name="consignmentOwner"
-          type="text"
-          component={renderConsignmentOwnerField}
-          style={{ marginTop: 10 }}
-        />
-        <Grid container direction="row" style={{ marginTop: 10 }}>
-          <Grid item style={{ width: "60%" }}>
-            <Field
-              label=""
-              id="consignmentType"
-              name="consignmentType"
-              type="text"
-              component={renderConsignmentType}
-            />
-          </Grid>
-          <Grid item style={{ width: "39%", marginLeft: 5 }}>
-            <Field
-              label=""
-              id="consignmentWeight"
-              name="consignmentWeight"
-              type="number"
-              component={renderWeightinKg}
-            />
-          </Grid>
-        </Grid>
-        <Field
-          label=""
-          id="consignmentDescription"
-          name="consignmentDescription"
-          type="text"
-          component={renderConsignmentDescriptionField}
-        />
-        <FormLabel
-          style={{ color: "blue", marginTop: 15, fontSize: "1em" }}
-          component="legend"
-        >
-          Enter Consignment Source Location Details
-        </FormLabel>
-        <Grid container direction="row" style={{ marginTop: 10 }}>
-          <Grid item style={{ width: "59%" }}>
-            <Field
-              label=""
-              id="consignmentSourceContactPerson"
-              name="consignmentSourceContactPerson"
-              type="text"
-              component={renderConsignmentSourceContactPerson}
-            />
-          </Grid>
-          <Grid item style={{ width: "39%", marginLeft: 5 }}>
-            <Field
-              label=""
-              id="consignmentSourceContactPhoneNumber"
-              name="consignmentSoyrceContactPhoneNumber"
-              type="number"
-              component={renderConsignmentSourceContactPhoneNumber}
-            />
-          </Grid>
-        </Grid>
-        <Field
-          label=""
-          id="consignmentSourceAddress"
-          name="consignmentSourceAddress"
-          type="text"
-          component={renderConsignmentLocationAddressField}
-        />
-        <Grid container direction="row" style={{ marginTop: 10 }}>
-          <Grid item style={{ width: "30%" }}>
-            <Field
-              label=""
-              id="consignmentsourcecity"
-              name="consignmentsourcecity"
-              type="text"
-              component={renderConsignmentSourceCityField}
-            />
-          </Grid>
-          <Grid item style={{ width: "33%", marginLeft: 10 }}>
-            <Field
-              label=""
-              id="consignmentsourcestate"
-              name="consignmentsourcestate"
-              type="text"
-              component={renderConsignmentSourceStateField}
-            />
-          </Grid>
-          <Grid item style={{ width: "33%", marginLeft: 10 }}>
-            <Field
-              label=""
-              id="consignmentsourcecountry"
-              name="consignmentsourcecountry"
-              type="text"
-              component={renderConsignmentSourceCountryField}
-            />
-          </Grid>
-        </Grid>
+          <Grid container direction="column" style={{ marginTop: 30 }}>
+            <Grid item>
+              <Field
+                label=""
+                id="vendorType"
+                name="vendorType"
+                component={renderTypeRadioField}
+              />
+            </Grid>
 
-        <FormLabel
-          style={{ color: "blue", marginTop: 10, fontSize: "1em" }}
-          component="legend"
-        >
-          Enter Consignment Destination Location Details
-        </FormLabel>
-        <Grid container direction="row" style={{ marginTop: 10 }}>
-          <Grid item style={{ width: "59%" }}>
-            <Field
-              label=""
-              id="consignmentDestinationContactPerson"
-              name="consignmentDestinationContactPerson"
-              type="text"
-              component={renderConsignmentDestinationContactPerson}
-            />
-          </Grid>
-          <Grid item style={{ width: "39%", marginLeft: 5 }}>
-            <Field
-              label=""
-              id="consignmentDestinationContactPhoneNumber"
-              name="consignmentDestinationContactPhoneNumber"
-              type="number"
-              component={renderConsignmentDestinationContactPhoneNumber}
-            />
-          </Grid>
-        </Grid>
-        <Field
-          label=""
-          id="consignmentDestinationAddress"
-          name="consignmentDestinationAddress"
-          type="text"
-          component={renderConsignmentDestinationAddressField}
-        />
-        <Grid container direction="row" style={{ marginTop: 10 }}>
-          <Grid item style={{ width: "30%" }}>
-            <Field
-              label=""
-              id="consignmentdestinationcity"
-              name="consignmentdestinationcity"
-              type="text"
-              component={renderConsignmentDestinationCityField}
-            />
-          </Grid>
-          <Grid item style={{ width: "33%", marginLeft: 10 }}>
-            <Field
-              label=""
-              id="consignmentdestinationstate"
-              name="consignmentdestinationstate"
-              type="text"
-              component={renderConsignmentDestinationStateField}
-            />
-          </Grid>
-          <Grid item style={{ width: "33%", marginLeft: 10 }}>
-            <Field
-              label=""
-              id="consignmentdestinationcountry"
-              name="consignmentdestinationcountry"
-              type="text"
-              component={renderConsignmentDestinationCountryField}
-            />
-          </Grid>
-        </Grid>
-        <FormLabel
-          style={{ color: "blue", marginTop: 10, fontSize: "1em" }}
-          component="legend"
-        >
-          Insurance
-        </FormLabel>
-        <Field
-          label=""
-          id="logisticsinsurancetype"
-          name="logisticsinsurancetype"
-          type="text"
-          component={renderLogisticsInsuranceTypeField}
-        />
+            <Grid container style={{ marginTop: 20 }}>
+              <FormLabel style={{ color: "blue" }} component="legend">
+                Enter Vendor Contacts
+              </FormLabel>
+            </Grid>
+            <Grid container direction="column" style={{ marginTop: 30 }}>
+              <Grid item>
+                <Field
+                  label=""
+                  id="locationAddress"
+                  name="locationAddress"
+                  type="text"
+                  component={renderVendorAddressField}
+                />
+              </Grid>
+              <Grid item container direction="row" style={{ marginTop: 20 }}>
+                <Grid item>
+                  <Field
+                    label=""
+                    id="locationCountry"
+                    name="locationCountry"
+                    component={renderVendorLocationCountryField}
+                  />
+                </Grid>
+                <Grid item style={{ marginLeft: 30 }}>
+                  <Field
+                    label=""
+                    id="locationState"
+                    name="locationState"
+                    component={renderVendorLocationStateField}
+                  />
+                </Grid>
 
-        <Button
-          variant="contained"
-          className={classes.submitButton}
-          onClick={props.handleSubmit(onSubmit)}
-        >
-          Place Order
-        </Button>
-      </Box>
-      {/* </form> */}
+                <Grid item style={{ marginLeft: 30 }}>
+                  <Field
+                    label=""
+                    id="locationCity"
+                    name="locationCity"
+                    component={renderVendorLocationCityField}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item style={{ marginTop: 30 }}>
+                <Field
+                  label=""
+                  id="contactPersonName"
+                  name="contactPersonName"
+                  component={renderVendorContactNameField}
+                />
+              </Grid>
+              <Grid item container direction="row" style={{ marginTop: 30 }}>
+                <Grid item>
+                  <Field
+                    label=""
+                    id="contactPersonPhoneNumber"
+                    name="contactPersonPhoneNumber"
+                    component={renderVendorPhoneNumberField}
+                  />
+                </Grid>
+                <Grid item style={{ marginLeft: 30, minWidth: "50%" }}>
+                  <Field
+                    label=""
+                    id="contactPersonEmailAddress"
+                    name="contactPersonEmailAddress"
+                    type="email"
+                    component={renderVendorEmailAddressField}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid container style={{ marginTop: 20 }}>
+              <FormLabel style={{ color: "blue" }} component="legend">
+                Enter Vendor Bank Details
+              </FormLabel>
+            </Grid>
+            <Grid container direction="row" style={{ marginTop: 20 }}>
+              <Grid item style={{ marginTop: 20 }}>
+                <Field
+                  label=""
+                  id="bankAccountType"
+                  name="bankAccountType"
+                  component={renderBankAccountTypeField}
+                  className={classes.dropDown}
+                />
+              </Grid>
+              <Grid item style={{ marginLeft: 20, marginTop: 20 }}>
+                <Field
+                  label=""
+                  id="bankAccountNumber"
+                  name="bankAccountNumber"
+                  type="text"
+                  component={renderBankAccountNumberField}
+                />
+              </Grid>
+              <Grid item style={{ marginLeft: 20, marginTop: 20 }}>
+                <Field
+                  label=""
+                  id="bankAccountName"
+                  name="bankAccountName"
+                  type="text"
+                  component={renderBankAccountNameField}
+                />
+              </Grid>
+            </Grid>
+            <Grid container direction="row">
+              <Grid item style={{ marginTop: 20 }}>
+                <Field
+                  label=""
+                  id="bankCountry"
+                  name="bankCountry"
+                  component={renderBankCountryField}
+                />
+              </Grid>
+              <Grid item style={{ marginLeft: 20, marginTop: 20 }}>
+                <Field
+                  label=""
+                  id="bankAccountSwiftCode"
+                  name="bankAccountSwiftCode"
+                  type="text"
+                  component={renderBankSwiftCodeNumberField}
+                />
+              </Grid>
+              <Grid item style={{ marginLeft: 20, marginTop: 20 }}>
+                <Field
+                  label=""
+                  id="bankAccountIBAN"
+                  name="bankAccountIBAN"
+                  type="text"
+                  component={renderBankIBANField}
+                />
+              </Grid>
+            </Grid>
+            <Grid item style={{ marginTop: 20 }}>
+              <Field
+                label=""
+                id="bankName"
+                name="bankName"
+                type="text"
+                component={renderBankNameField}
+              />
+            </Grid>
+            <FormLabel
+              style={{ color: "blue", marginTop: 30 }}
+              component="legend"
+            >
+              Vendor Contract
+            </FormLabel>
+
+            <Grid item style={{ marginTop: 20 }}>
+              <Field
+                label=""
+                id="enforceGlobalPlatformPolicyContract"
+                name="enforceGlobalPlatformPolicyContract"
+                // type="text"
+                component={renderEnforceGlobalPlatformPolicyField}
+              />
+            </Grid>
+            <Grid item style={{ marginTop: 20 }}>
+              <Field
+                label=""
+                id="permittableMaximumNumberOfPaymentInstallments"
+                name="permittableMaximumNumberOfPaymentInstallments"
+                //type="number"
+                component={rendermaxNumberOfPaymentInstallmentAllowed}
+              />
+            </Grid>
+            <FormLabel style={{ marginTop: 20 }} component="legend">
+              Initial Payment Details
+            </FormLabel>
+            <Grid item container direction="row">
+              <Grid item container direction="row">
+                <Grid item style={{ marginTop: 20, width: "28%" }}>
+                  <Field
+                    label="Enter agreed initial percentage payment"
+                    id="initialPaymentAgreedRemittablePercentage"
+                    name="initialPaymentAgreedRemittablePercentage"
+                    type="number"
+                    component={renderAgreedInitialPercentagePaymentField}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  style={{ marginLeft: 5, marginTop: 20, width: "38%" }}
+                >
+                  <Field
+                    label="Enter agreed number of days to remittance"
+                    id="initialPaymentAgreedDaysToPaymentRemittance"
+                    name="initialPaymentAgreedDaysToPaymentRemittance"
+                    type="number"
+                    component={renderAgreedDaysToPaymentRemittanceField}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  style={{ marginLeft: 5, marginTop: 20, width: "31%" }}
+                >
+                  <Field
+                    label="Enter Platform Percentage Charge"
+                    id="initialPaymentPlatformPercentageForRetention"
+                    name="initialPaymentPlatformPercentageForRetention"
+                    type="number"
+                    component={renderPlatformPercentageChargeField}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <FormLabel style={{ marginTop: 20 }} component="legend">
+              Second Payment Details
+            </FormLabel>
+            <Grid item container direction="row">
+              <Grid item container direction="row">
+                <Grid item style={{ marginTop: 20, width: "28%" }}>
+                  <Field
+                    label="Enter agreed initial percentage payment"
+                    id="secondPaymentAgreedRemittablePercentage"
+                    name="secondPaymentAgreedRemittablePercentage"
+                    type="number"
+                    component={renderAgreedSecondPercentagePaymentField}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  style={{ marginLeft: 5, marginTop: 20, width: "38%" }}
+                >
+                  <Field
+                    label="Enter agreed number of days to remittance"
+                    id="secondPaymentAgreedDaysToPaymentRemittance"
+                    name="secondPaymentAgreedDaysToPaymentRemittance"
+                    type="number"
+                    component={renderAgreedSecondDaysToPaymentRemittanceField}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  style={{ marginLeft: 5, marginTop: 20, width: "31%" }}
+                >
+                  <Field
+                    label="Enter Platform Percentage Charge"
+                    id="secondPaymentPlatformPercentageForRetention"
+                    name="secondPaymentPlatformPercentageForRetention"
+                    type="number"
+                    component={renderSecondPlatformPercentageChargeField}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <FormLabel style={{ marginTop: 20 }} component="legend">
+              Third Payment Details
+            </FormLabel>
+            <Grid item container direction="row">
+              <Grid item container direction="row">
+                <Grid item style={{ marginTop: 20, width: "28%" }}>
+                  <Field
+                    label="Enter agreed initial percentage payment"
+                    id="thirdPaymentAgreedRemittablePercentage"
+                    name="thirdPaymentAgreedRemittablePercentage"
+                    type="number"
+                    component={renderAgreedThirdPercentagePaymentField}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  style={{ marginLeft: 5, marginTop: 20, width: "38%" }}
+                >
+                  <Field
+                    label="Enter agreed number of days to remittance"
+                    id="thirdPaymentAgreedDaysToPaymentRemittance"
+                    name="thirdPaymentAgreedDaysToPaymentRemittance"
+                    type="number"
+                    component={renderAgreedThirdDaysToPaymentRemittanceField}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  style={{ marginLeft: 5, marginTop: 20, width: "31%" }}
+                >
+                  <Field
+                    label="Enter Platform Percentage Charge"
+                    id="thirdPaymentPlatformPercentageForRetention"
+                    name="thirdPaymentPlatformPercentageForRetention"
+                    type="number"
+                    component={renderThirdPlatformPercentageChargeField}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Button
+            variant="contained"
+            className={classes.submitButton}
+            onClick={props.handleSubmit(onSubmit)}
+          >
+            {/* Update Vendor */}
+            {loading ? (
+              <CircularProgress size={30} color="inherit" />
+            ) : (
+              buttonContent()
+            )}
+          </Button>
+        </Box>
+      </form>
     </div>
   );
 }
 
 export default reduxForm({
-  form: "orderForm",
-})(OrderForm);
+  form: "vendorForm",
+})(VendorForm);

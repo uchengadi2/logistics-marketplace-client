@@ -5,6 +5,7 @@ import {
   EDIT_PAYMENT,
   DELETE_PAYMENT,
   MAKE_PAYMENT,
+  BOOK_PAYMENT,
 } from "./../actions/types";
 
 export default (state = {}, action) => {
@@ -17,6 +18,8 @@ export default (state = {}, action) => {
     case MAKE_PAYMENT:
       return { ...state, [action.payload.id]: action.payload };
     case EDIT_PAYMENT:
+      return { ...state, [action.payload.id]: action.payload };
+    case BOOK_PAYMENT:
       return { ...state, [action.payload.id]: action.payload };
     case DELETE_PAYMENT:
       return _.omit(state, action.payload); //note that payload is just the payment id

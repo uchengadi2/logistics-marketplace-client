@@ -10,20 +10,16 @@ class StateFormContainer extends React.Component {
       open: false,
     };
   }
-  componentDidMount() {
-    console.log("a;; the props are:", this.props);
-  }
+  componentDidMount() {}
 
   onSubmit = (formValues) => {
     this.props.createState(formValues, this.props.token);
     this.props.handleDialogOpenStatus();
-
-    console.log("the form values areeeee:", formValues);
   };
   render() {
     return (
       <div>
-        <StateForm onSubmit={this.onSubmit} />
+        <StateForm onSubmit={this.onSubmit} userId={this.props.userId} />
       </div>
     );
   }

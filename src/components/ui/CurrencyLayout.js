@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function CurrencyLayout({ token }) {
+function CurrencyLayout({ token, userId }) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -97,7 +97,7 @@ function CurrencyLayout({ token }) {
           </Toolbar>
         </Grid>
         <Grid item className={classes.contentContainer}>
-          <CurrencyList token={token} />
+          <CurrencyList token={token} userId={userId} />
         </Grid>
       </Grid>
       <Dialog
@@ -109,6 +109,7 @@ function CurrencyLayout({ token }) {
         <DialogContent>
           <CurrencyFormContainer
             token={token}
+            userId={userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
           />
         </DialogContent>

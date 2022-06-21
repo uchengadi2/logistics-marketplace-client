@@ -105,7 +105,7 @@ function OrderEditForm(props) {
           logisticsInsurancetype: order.logisticsInsurancetype,
           consignmentName: order.consignment.name,
           consignmentDescription: order.consignment.description,
-          consignmentWeight: order.consignment.weight,
+          //consignmentWeight:order.consignment.weight.weight,
           consignmentOwner: order.consignment.owner,
           consignmentType: order.consignment.type,
           consignmentQuantity: order.consignment.quantity,
@@ -455,7 +455,6 @@ function OrderEditForm(props) {
     });
   };
 
-  
   const renderSelectNameField = ({
     input,
     label,

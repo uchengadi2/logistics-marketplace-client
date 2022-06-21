@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Field, reduxForm } from "redux-form";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { TextField } from "@material-ui/core";
+import { TextField, Typography } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
@@ -13,6 +13,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
+import data from "./../../../apis/local";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,10 +41,41 @@ function CurrencyForm(props) {
   const classes = useStyles();
 
   const [country, setCountry] = useState();
+  const [countryList, setCountryList] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let allData = [];
+      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await data.get("/countries");
+      const workingData = response.data.data.data;
+      workingData.map((country) => {
+        allData.push({ id: country._id, name: country.name });
+      });
+      setCountryList(allData);
+    };
+
+    //call the function
+
+    fetchData().catch(console.error);
+  }, []);
 
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
   };
+
+  //get the country list
+  const renderCountryList = () => {
+    return countryList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
+  };
+
+  console.log("this is the country list", countryList);
 
   const renderCurrencyNameField = ({
     input,
@@ -65,10 +97,7 @@ function CurrencyForm(props) {
         //required
         type={type}
         {...custom}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        {...input}
       />
     );
   };
@@ -93,10 +122,7 @@ function CurrencyForm(props) {
         //required
         type={type}
         {...custom}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        {...input}
       />
     );
   };
@@ -120,15 +146,9 @@ function CurrencyForm(props) {
             onChange={handleCountryChange}
             label="Country"
             style={{ width: 500 }}
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"africa"}>Africa</MenuItem>
-            <MenuItem value={"europe"}>Europe</MenuItem>
-            <MenuItem value={"asia"}>Asia</MenuItem>
-            <MenuItem value={"north-america"}>North America</MenuItem>
-            <MenuItem value={"south-america"}>South America</MenuItem>
+            {renderCountryList()}
           </Select>
           <FormHelperText>Select Country</FormHelperText>
         </FormControl>
@@ -157,7 +177,8 @@ function CurrencyForm(props) {
         type={type}
         {...custom}
         multiline={true}
-        minRows={7}
+        minRows={4}
+        {...input}
 
         // style={{ marginTop: 10 }}
 
@@ -174,6 +195,7 @@ function CurrencyForm(props) {
     id,
     ...custom
   }) => {
+    delete input.value;
     return (
       <TextField
         id={input.name}
@@ -182,12 +204,26 @@ function CurrencyForm(props) {
         fullWidth
         style={{ marginTop: 20 }}
         helperText="Upload Currency Symbol"
+        {...input}
       />
     );
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    const form = new FormData();
+    form.append("name", formValues.name);
+    form.append("code", formValues.code);
+    form.append("description", formValues.description);
+    form.append("country", formValues.country);
+    form.append("createdBy", props.userId);
+    if (formValues.symbol) {
+      form.append("symbol", formValues.symbol[0]);
+    }
+
+    console.log("currency form values are:", formValues);
+    console.log("currency created by:", props.userId);
+
+    props.onSubmit(form);
   };
 
   return (
@@ -197,7 +233,7 @@ function CurrencyForm(props) {
           style={{ color: "blue", fontSize: "1.5em" }}
           component="legend"
         >
-          Enter New Currency Details
+          <Typography variant="h5">Enter New Currency Details</Typography>
         </FormLabel>
       </Grid>
       <Box
@@ -206,7 +242,7 @@ function CurrencyForm(props) {
         // onSubmit={onSubmit}
         sx={{
           width: 500,
-          height: 420,
+          height: 460,
         }}
         noValidate
         autoComplete="off"
@@ -256,6 +292,7 @@ function CurrencyForm(props) {
           id="symbol"
           name="symbol"
           type="file"
+          accept="image/*"
           component={renderCurrencySymbolField}
           style={{ marginTop: 10 }}
         />

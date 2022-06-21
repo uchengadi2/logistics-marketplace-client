@@ -71,10 +71,7 @@ function StateEditForm(props) {
         //required
         type={type}
         {...custom}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        {...input}
       />
     );
   };
@@ -99,10 +96,7 @@ function StateEditForm(props) {
         //required
         type={type}
         {...custom}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        {...input}
       />
     );
   };
@@ -126,10 +120,8 @@ function StateEditForm(props) {
             onChange={handleCountryChange}
             label="Country"
             style={{ width: 300 }}
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
             <MenuItem value={"africa"}>Africa</MenuItem>
             <MenuItem value={"europe"}>Europe</MenuItem>
             <MenuItem value={"asia"}>Asia</MenuItem>
@@ -161,10 +153,8 @@ function StateEditForm(props) {
             onChange={handleRegionChange}
             label="Country Region"
             style={{ width: 190 }}
+            {...input}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
             <MenuItem value={"west"}>West</MenuItem>
             <MenuItem value={"east"}>East</MenuItem>
             <MenuItem value={"north"}>North</MenuItem>
@@ -206,11 +196,8 @@ function StateEditForm(props) {
         type={type}
         {...custom}
         multiline={true}
-        minRows={7}
-
-        // style={{ marginTop: 10 }}
-
-        //onChange={handleInput}
+        minRows={4}
+        {...input}
       />
     );
   };
