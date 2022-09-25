@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Field, reduxForm } from "redux-form";
+import { Field, formValueSelector, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -17,11 +19,12 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import data from "./../../apis/local";
+import api from "./../../apis/local";
+import { EDIT_CITY } from "../../actions/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: 10,
+    marginTop: 20,
   },
   formStyles: {
     width: 600,
@@ -29,8 +32,8 @@ const useStyles = makeStyles((theme) => ({
   submitButton: {
     borderRadius: 10,
     height: 40,
-    width: 150,
-    marginLeft: 180,
+    width: 100,
+    marginLeft: 200,
     marginTop: 10,
     marginBottom: 10,
     color: "white",
@@ -41,50 +44,112 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the name of the city"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderCityCodeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the code for this City"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderDescriptionField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Describe the city"
+      label={label}
+      id={input.name}
+      // value={formInput.description}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={5}
+      {...custom}
+      onChange={input.onChange}
+
+      // onChange={handleInput}
+    />
+  );
+};
+
 function CityEditForm(props) {
+  const { params } = props;
   const classes = useStyles();
-  const [state, setState] = useState("");
-  const [country, setCountry] = useState("");
-  const [params, setParams] = useState({});
-  const [selectedState, setSelectedState] = useState();
-  const [selectedCountry, setSelectedCountry] = useState();
+  const [state, setState] = useState(params.state);
+  const [country, setCountry] = useState(params.country);
   const [countryList, setCountryList] = useState([]);
   const [stateList, setStateList] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get(`/cities/${props.params.id}`);
-      const workingData = Object.values(response.data.data);
-      let row = {};
-      workingData.map((city) => {
-        console.log("this is the products:", city);
-        row = {
-          id: city.id,
-          name: city.name,
-          code: city.code,
-          description: city.description,
-          country: city.country[0],
-          state: city.state[0],
-          securityStatus: city.securityStatus,
-        };
-      });
-      setParams(row);
-      setSelectedCountry(row.country);
-      setSelectedState(row.state);
-    };
-
-    //call the function
-
-    fetchData().catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/countries");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/countries");
       const workingData = response.data.data.data;
       workingData.map((country) => {
         allData.push({ id: country._id, name: country.name });
@@ -100,9 +165,9 @@ function CityEditForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/states", {
-        params: { country: selectedCountry },
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get(`/states`, {
+        params: { country: country },
       });
       const workingData = response.data.data.data;
       workingData.map((state) => {
@@ -114,29 +179,18 @@ function CityEditForm(props) {
     //call the function
 
     fetchData().catch(console.error);
-  }, [selectedCountry]);
+  }, [country]);
 
-  const handleSelectedStateChange = (event) => {
-    setSelectedState(event.target.value);
+  const handleStateChange = (event) => {
+    setState(event.target.value);
   };
 
-  const handleSelectedCountryChange = (event) => {
-    setSelectedCountry(event.target.value);
+  const handleCountryChange = (event) => {
+    setCountry(event.target.value);
     setStateList([]);
   };
 
-  //get all country list
-  const renderCountryList = () => {
-    return countryList.map((item) => {
-      return (
-        <MenuItem key={item.id} value={item.id}>
-          {item.name}
-        </MenuItem>
-      );
-    });
-  };
-
-  //get all state list
+  //get the state list
   const renderStateList = () => {
     return stateList.map((item) => {
       return (
@@ -147,56 +201,15 @@ function CityEditForm(props) {
     });
   };
 
-  const renderNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the name of the city"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderCityCodeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the code for this City"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.code}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
+  //get the country list
+  const renderCountryList = () => {
+    return countryList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
   };
 
   const renderStateField = ({
@@ -214,10 +227,10 @@ function CityEditForm(props) {
           <Select
             labelId="state"
             id="state"
-            value={selectedState ? selectedState : params.state}
-            onChange={handleSelectedStateChange}
+            value={state}
+            onChange={handleStateChange}
             label="State"
-            style={{ marginTop: 20, width: 500 }}
+            style={{ marginTop: 20, width: 500, height: 38 }}
           >
             {renderStateList()}
           </Select>
@@ -244,10 +257,10 @@ function CityEditForm(props) {
           <Select
             labelId="country"
             id="country"
-            value={selectedCountry ? selectedCountry : params.country}
-            onChange={handleSelectedCountryChange}
+            value={country}
+            onChange={handleCountryChange}
             label="Country"
-            style={{ marginTop: 20, width: 500 }}
+            style={{ marginTop: 20, width: 500, height: 38 }}
           >
             {renderCountryList()}
           </Select>
@@ -257,43 +270,59 @@ function CityEditForm(props) {
     );
   };
 
-  const renderDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Describe the city"
-        label={label}
-        id={input.name}
-        value={params.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={5}
-        {...custom}
-        // onChange={handleInput}
-      />
-    );
+  const buttonContent = () => {
+    return <React.Fragment> Submit</React.Fragment>;
   };
 
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    setLoading(true);
+    const data = {
+      name: formValues.name ? formValues.name : params.name,
+      code: formValues.code ? formValues.code : params.code,
+
+      description: formValues.description
+        ? formValues.description
+        : params.description,
+      country: country,
+      state: state,
+      createdBy: props.userId,
+    };
+    if (formValues) {
+      const createForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.patch(`/cities/${params.id}`, data);
+
+        if (response.data.status === "success") {
+          dispatch({
+            type: EDIT_CITY,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulEditSnackbar(
+            `${response.data.data.data.name} City is updated successfully!!!`
+          );
+          props.handleEditDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      createForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   return (
     <div className={classes.root}>
       <Grid item container justifyContent="center">
         <FormLabel
-          style={{ color: "blue", fontSize: "1.5em" }}
+          style={{ color: "grey", fontSize: "1.3em" }}
           component="legend"
         >
           City Details
@@ -301,11 +330,11 @@ function CityEditForm(props) {
       </Grid>
       <Box
         component="form"
-        id="cityForm"
+        id="cityEditForm"
         // onSubmit={onSubmit}
         sx={{
           width: 500,
-          height: 420,
+          height: 450,
         }}
         noValidate
         autoComplete="off"
@@ -317,6 +346,7 @@ function CityEditForm(props) {
               label=""
               id="name"
               name="name"
+              defaultValue={params.name}
               type="text"
               component={renderNameField}
             />
@@ -326,6 +356,7 @@ function CityEditForm(props) {
               label=""
               id="code"
               name="code"
+              defaultValue={params.code}
               type="text"
               component={renderCityCodeField}
             />
@@ -352,6 +383,7 @@ function CityEditForm(props) {
           label=""
           id="description"
           name="description"
+          defaultValue={params.description}
           type="text"
           component={renderDescriptionField}
         />
@@ -361,7 +393,11 @@ function CityEditForm(props) {
           className={classes.submitButton}
           onClick={props.handleSubmit(onSubmit)}
         >
-          Update City
+          {loading ? (
+            <CircularProgress size={30} color="inherit" />
+          ) : (
+            buttonContent()
+          )}
         </Button>
       </Box>
       {/* </form> */}
@@ -370,5 +406,5 @@ function CityEditForm(props) {
 }
 
 export default reduxForm({
-  form: "cityForm",
+  form: "cityEditForm",
 })(CityEditForm);

@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
+import Snackbar from "@material-ui/core/Snackbar";
 import DialogContent from "@material-ui/core/DialogContent";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
@@ -11,6 +12,7 @@ import { fetchVendors } from "../../actions";
 import DataGridContainer from "../DataGridContainer";
 import VendorEdit from "./VendorEdit";
 import VendorDelete from "./VendorDelete";
+import VendorEditForm from "./VendorEditForm";
 
 class VendorList extends React.Component {
   constructor(props) {
@@ -21,6 +23,11 @@ class VendorList extends React.Component {
       blacklistOpen: false,
       id: null,
       params: {},
+      alert: {
+        open: false,
+        message: "",
+        backgroundColor: "",
+      },
     };
   }
   componentDidMount() {
@@ -37,6 +44,29 @@ class VendorList extends React.Component {
     this.setState({ editOpen: false });
   };
 
+  handleSuccessfulEditSnackbar = (message) => {
+    // history.push("/categories/new");
+    this.setState({ editOpen: false });
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#4BB543",
+      },
+    });
+  };
+
+  handleFailedSnackbar = (message) => {
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#FF3232",
+      },
+    });
+    this.setState({ editOpen: false });
+  };
+
   renderEditDialogForm = () => {
     //token will be used here
     return (
@@ -49,11 +79,13 @@ class VendorList extends React.Component {
           ]}
         >
           <DialogContent>
-            <VendorEdit
+            <VendorEditForm
               token={this.props.token}
               userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
+              handleSuccessfulEditSnackbar={this.handleSuccessfulEditSnackbar}
+              handleFailedSnackbar={this.handleFailedSnackbar}
             />
           </DialogContent>
         </Dialog>
@@ -110,11 +142,10 @@ class VendorList extends React.Component {
     let rows = [];
     let counter = 0;
     const columns = [
-      { field: "numbering", headerName: "S/n", width: 50 },
-      { field: "name", headerName: "Vendor Name", width: 300 },
-      { field: "description", headerName: "Description", width: 450 },
-      { field: "country", headerName: "Country", width: 200 },
-      { field: "contactPersonName", headerName: "Contact Name", width: 200 },
+      { field: "numbering", headerName: "S/n", width: 60 },
+      { field: "name", headerName: "Vendor Name", width: 200 },
+      { field: "vendorNumber", headerName: "Vendor Number", width: 200 },
+      { field: "type", headerName: "Vendor Type", width: 200 },
       {
         field: "editaction",
         headerName: "",
@@ -180,9 +211,16 @@ class VendorList extends React.Component {
         id: vendor.id,
         name: vendor.name,
         description: vendor.description,
-        city: vendor.location.locationCity[0],
-        country: vendor.vendorCountry[0],
-        contactPersonName: vendor.contactPerson.contactPersonName,
+        vendorNumber: vendor.vendorNumber,
+        type: vendor.type,
+        logo: vendor.logo,
+        vendorCountry: vendor.vendorCountry,
+        location: vendor.location,
+        contactPerson: vendor.contactPerson,
+        bankDetails: vendor.bankDetails,
+        contract: vendor.contract,
+        exemptedCities: vendor.exemptedCities,
+        product: vendor.product,
       };
       rows.push(row);
     });
@@ -196,6 +234,16 @@ class VendorList extends React.Component {
         {this.renderEditDialogForm()}
         {this.renderVendorList()}
         {this.renderBlackListDialogForm()}
+        <Snackbar
+          open={this.state.alert.open}
+          message={this.state.alert.message}
+          ContentProps={{
+            style: { backgroundColor: this.state.alert.backgroundColor },
+          }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => this.setState({ alert: { ...alert, open: false } })}
+          autoHideDuration={4000}
+        />
       </>
     );
   }

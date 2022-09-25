@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Field, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -17,7 +18,10 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import data from "./../../apis/local";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { EDIT_VENDOR } from "../../actions/types";
+
+import api from "./../../apis/local";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,130 +51,688 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderAgreedInitialPercentagePaymentField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter initial % payment"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedDaysToPaymentRemittanceField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Days from payment to remittance"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderPlatformPercentageChargeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Platform percentage charge"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedSecondPercentagePaymentField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter second % payment"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedSecondDaysToPaymentRemittanceField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Days from payment to remittance"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderSecondPlatformPercentageChargeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Platform percentage charge"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedThirdPercentagePaymentField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter third % payment"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedThirdDaysToPaymentRemittanceField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Days from payment to remittance"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderThirdPlatformPercentageChargeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Platform percentage charge"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the name of the Vendor"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderDescriptionField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Describe the Vendor"
+      label={label}
+      id={input.name}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={4}
+      {...custom}
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderImageField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      id={input.name}
+      variant="outlined"
+      type={type}
+      fullWidth
+      style={{ marginTop: 20 }}
+      helperText="Upload Category Image"
+    />
+  );
+};
+
+const renderVendorAddressField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the Vendor Address Location"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      multiline={true}
+      minRows={2}
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVendorContactNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the contact Person's Name"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVendorPhoneNumberField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the contact person's phone numbers"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVendorEmailAddressField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the contact Person's email address"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankAccountNumberField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank account number"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankAccountNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank account name"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankSwiftCodeNumberField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank Swift code"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankIBANField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank IBAN number"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank name"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
 function VendorEditForm(props) {
+  const { params } = props;
   const classes = useStyles();
-  const [value, setValue] = useState("corporate");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
-  const [countryStateList, setCountryStateList] = useState([]);
-  const [stateCityList, setStateCityList] = useState([]);
-  const [accountType, setAccountType] = useState("");
-  const [bankCountry, setBankCountry] = useState("");
-  const [params, setParams] = useState({});
+  const [locationCity, setLocationCity] = useState(
+    params.location.locationCity
+  );
+  const [locationState, setLocationState] = useState(
+    params.location.locationState
+  );
+  const [locationCountry, setLocationCountry] = useState(params.vendorCountry);
+
+  const [bankCountry, setBankCountry] = useState(
+    params.bankDetails.bankCountry
+  );
+
   const [cityList, setCityList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [countryList, setCountryList] = useState([]);
-
-  const [enforceGlobalPlatformPolicy, setEnforceGlobalPlatformPolicy] =
-    useState("true");
+  const [bankAccountType, setBankAccountType] = useState(
+    params.bankDetails.bankAccountType
+  );
+  const [vendorType, setVendorType] = useState(params.type);
   const [
-    maxNumberOfPaymentInstallmentAllowed,
-    setMaxNumberOfPaymentInstallmentAllowed,
-  ] = useState("1");
+    enforceGlobalPlatformPolicyContract,
+    setEnforceGlobalPlatformPolicyContract,
+  ] = useState(params.contract.enforceGlobalPlatformPolicyContract.toString());
+  const [
+    permittableMaximumNumberOfPaymentInstallments,
+    setPermittableMaximumNumberOfPaymentInstallments,
+  ] = useState(
+    params.contract.permittableMaximumNumberOfPaymentInstallments.toString()
+  );
+  const [loading, setLoading] = useState(false);
 
   //spool the vendor document & data
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // let allData = [{ id: "all", name: "All" }];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get(`/vendors/${props.params.id}`, {
-        // params: { id: props.params.id },
-      });
+  const dispatch = useDispatch();
 
-      const workingData = Object.values(response.data.data);
-      let row = {};
-      workingData.map((vendor) => {
-        row = {
-          id: vendor.id,
-          name: vendor.name,
-          description: vendor.description,
-          city: vendor.location.locationCity[0],
-          country: vendor.vendorCountry[0],
-          type: vendor.type,
-          exemptedCities:
-            vendor.exemptedCities[0] + " " + vendor.exemptedCities[1],
-          contactPersonName: vendor.contactPerson.contactPersonName,
-          contactPersonPhoneNumber:
-            vendor.contactPerson.contactPersonPhoneNumber[0],
-          contactPersonEmailAddress:
-            vendor.contactPerson.contactPersonEmailAddress,
-          locationCity: vendor.location.locationCity[0],
-          locationState: vendor.location.locationState[0],
-          locationCountry: vendor.location.locationCountry[0],
-          locationAddress: vendor.location.locationAddress,
-          locationLatitude: vendor.location.locationLatitude,
-          locationLongititde: vendor.location.locationLongititde,
-          officePhoneNumber: vendor.location.officePhoneNumber,
-          bankAccountType: vendor.bankDetails.bankAccountType,
-          bankCountry: vendor.bankDetails.bankCountry[0],
-          bankName: vendor.bankDetails.bankName,
-          bankAccountNumber: vendor.bankDetails.bankAccountNumber,
-          bankAccountName: vendor.bankDetails.bankAccountName,
-          bankAccountSwiftCode: vendor.bankDetails.bankAccountSwiftCode,
-          bankAccountIBAN: vendor.bankDetails.bankAccountIBAN,
-          bankAccountIBAN: vendor.bankDetails.bankAccountIBAN,
-          enforceGlobalPlatformPolicyContract:
-            vendor.contract.enforceGlobalPlatformPolicyContract,
-          permittableMaximumNumberOfPaymentInstallments:
-            vendor.contract.permittableMaximumNumberOfPaymentInstallments,
-          initialPaymentAgreedRemittablePercentage:
-            vendor.contract.initialPaymentInstallment
-              .initialPaymentAgreedRemittablePercentage,
-          initialPaymentAgreedDaysToPaymentRemittance:
-            vendor.contract.initialPaymentInstallment
-              .initialPaymentAgreedDaysToPaymentRemittance,
-          initialPaymentPlatformPercentageForRetention:
-            vendor.contract.initialPaymentInstallment
-              .initialPaymentPlatformPercentageForRetention,
-          percentageAmountForInitialInstallmentPayment:
-            vendor.contract.initialPaymentInstallment
-              .percentageAmountForInitialInstallmentPayment,
-          secondPaymentAgreedRemittablePercentage:
-            vendor.contract.secondPaymentInstallment
-              .secondPaymentAgreedRemittablePercentage,
-          secondPaymentAgreedDaysToPaymentRemittance:
-            vendor.contract.secondPaymentInstallment
-              .secondPaymentAgreedDaysToPaymentRemittance,
-          secondPaymentPlatformPercentageForRetention:
-            vendor.contract.secondPaymentInstallment
-              .secondPaymentPlatformPercentageForRetention,
-          percentageAmountForSecondInstallmentPayment:
-            vendor.contract.secondPaymentInstallment
-              .percentageAmountForSecondInstallmentPayment,
-          thirdPaymentAgreedRemittablePercentage:
-            vendor.contract.thirdPaymentInstallment
-              .thirdPaymentAgreedRemittablePercentage,
-          thirdPaymentAgreedDaysToPaymentRemittance:
-            vendor.contract.thirdPaymentInstallment
-              .thirdPaymentAgreedDaysToPaymentRemittance,
-          thirdPaymentPlatformPercentageForRetention:
-            vendor.contract.thirdPaymentInstallment
-              .thirdPaymentPlatformPercentageForRetention,
-          percentageAmountForThirdInstallmentPayment:
-            vendor.contract.thirdPaymentInstallment
-              .percentageAmountForThirdInstallmentPayment,
-        };
-      });
-
-      setParams(row);
-      setSelectedCountry(row.locationCountry);
-      setSelectedState(row.locationState);
-    };
-
-    //call the function
-
-    fetchData().catch(console.error);
-  }, [props.params.id]);
+  console.log("this is params:", params);
+  console.log(
+    " params.location.locationCity:",
+    params.location.locationCity[0]
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/countries");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/countries");
       const workingData = response.data.data.data;
       workingData.map((country) => {
         allData.push({ id: country._id, name: country.name });
@@ -186,10 +748,11 @@ function VendorEditForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/states", {
-        params: { country: selectedCountry },
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/states", {
+        params: { country: locationCountry },
       });
+
       const workingData = response.data.data.data;
       workingData.map((state) => {
         allData.push({ id: state._id, name: state.name });
@@ -200,14 +763,16 @@ function VendorEditForm(props) {
     //call the function
 
     fetchData().catch(console.error);
-  }, [selectedCountry]);
+  }, [locationCountry]);
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/cities", {
-        params: { state: selectedState },
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/cities", {
+        params: {
+          state: locationState,
+        },
       });
       const workingData = response.data.data.data;
       workingData.map((city) => {
@@ -219,30 +784,29 @@ function VendorEditForm(props) {
     //call the function
 
     fetchData().catch(console.error);
-  }, [selectedState]);
+  }, [locationState]);
 
-  const handleChange = (event) => {
-    setValue(event.target.value);
+  const handleVendorTypeChange = (event) => {
+    setVendorType(event.target.value);
   };
 
-  const handleSelectedCityChange = (event) => {
-    setSelectedCity(event.target.value);
+  const handleLocationCityChange = (event) => {
+    setLocationCity(event.target.value);
   };
 
-  const handleSelectedStateChange = (event) => {
-    setSelectedState(event.target.value);
+  const handleLocationStateChange = (event) => {
+    setLocationState(event.target.value);
     setCityList([]);
   };
 
-  const handleSelectedCountryChange = (event) => {
-    setSelectedCountry(event.target.value);
-    //currentCountryStateList(event.target.value);
+  const handleLocationCountryChange = (event) => {
+    setLocationCountry(event.target.value);
     setStateList([]);
     setCityList([]);
   };
 
   const handleAccountTypeChange = (event) => {
-    setAccountType(event.target.value);
+    setBankAccountType(event.target.value);
   };
 
   const handleBankCountryChange = (event) => {
@@ -250,25 +814,12 @@ function VendorEditForm(props) {
   };
 
   const handleGlobalPolicyChange = (event) => {
-    setEnforceGlobalPlatformPolicy(event.target.value);
+    setEnforceGlobalPlatformPolicyContract(event.target.value);
   };
 
   const handleMaximumPaymentInstallmentChange = (event) => {
-    setMaxNumberOfPaymentInstallmentAllowed(event.target.value);
+    setPermittableMaximumNumberOfPaymentInstallments(event.target.value);
   };
-
-  // const newParams = Object.values(params);
-  // const contactPersonName = ((params || {}).contactPerson || {})
-  //   .contactPersonName;
-
-  // const percentageAmountForThirdInstallmentPayment = (
-  //   (params || {}).contract ||
-  //   {}.thirdPaymentInstallment ||
-  //   {}
-  // ).percentageAmountForThirdInstallmentPayment;
-
-  console.log("this is initial city  list:", cityList);
-  console.log("this is the selected state listttttt:", selectedState);
 
   //get the city list
   const renderCityList = () => {
@@ -303,80 +854,6 @@ function VendorEditForm(props) {
     });
   };
 
-  const renderNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the name of the Vendor"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Describe the Vendor"
-        label={label}
-        id={input.name}
-        value={params.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={8}
-        {...custom}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderImageField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        id={input.name}
-        variant="outlined"
-        type={type}
-        fullWidth
-        style={{ marginTop: 20 }}
-        helperText="Upload Category Image"
-      />
-    );
-  };
-
   const renderTypeRadioField = ({
     input,
     label,
@@ -394,8 +871,9 @@ function VendorEditForm(props) {
           <RadioGroup
             aria-label="type"
             name="type"
-            value={params.type}
-            onChange={handleChange}
+            value={vendorType}
+            onChange={handleVendorTypeChange}
+            style={{ height: 38 }}
           >
             <Grid item container direction="row">
               <Grid item>
@@ -419,34 +897,6 @@ function VendorEditForm(props) {
     );
   };
 
-  const renderVendorAddressField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the Vendor Address Location"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.locationAddress}
-        fullWidth
-        multiline={true}
-        minRows={2}
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
   const renderVendorLocationCityField = ({
     input,
     label,
@@ -462,9 +912,10 @@ function VendorEditForm(props) {
           <Select
             labelId="city"
             id="city"
-            value={selectedCity ? selectedCity : params.locationCity}
-            onChange={handleSelectedCityChange}
+            value={locationCity}
+            onChange={handleLocationCityChange}
             label="City"
+            style={{ height: 38 }}
           >
             {renderCityList()}
           </Select>
@@ -489,9 +940,10 @@ function VendorEditForm(props) {
           <Select
             labelId="locationState"
             id="locationState"
-            value={selectedState ? selectedState : params.locationState}
-            onChange={handleSelectedStateChange}
+            value={locationState}
+            onChange={handleLocationStateChange}
             label="State"
+            style={{ height: 38 }}
           >
             {renderStateList()}
           </Select>
@@ -516,93 +968,16 @@ function VendorEditForm(props) {
           <Select
             labelId="locationCountry"
             id="locationCountry"
-            value={selectedCountry ? selectedCountry : params.locationCountry}
-            onChange={handleSelectedCountryChange}
+            value={locationCountry}
+            onChange={handleLocationCountryChange}
             label="Country"
+            style={{ height: 38 }}
           >
             {renderCountryList()}
           </Select>
           <FormHelperText>Select Country</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderVendorContactNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the contact Person's Name"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.contactPersonName}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVendorPhoneNumberField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the contact person's phone numbers"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.contactPersonPhoneNumber}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVendorEmailAddressField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the contact Person's email address"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.contactPersonEmailAddress}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -621,9 +996,10 @@ function VendorEditForm(props) {
           <Select
             labelId="bankAccountType"
             id="bankAccountType"
-            value={params.bankAccountType}
+            value={bankAccountType}
             onChange={handleAccountTypeChange}
             label="Account Type"
+            style={{ height: 38 }}
           >
             <MenuItem value={"savings"}>Savings</MenuItem>
             <MenuItem value={"current"}>Current</MenuItem>
@@ -632,58 +1008,6 @@ function VendorEditForm(props) {
           <FormHelperText>Select Account Type</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderBankAccountNumberField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank account number"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.bankAccountNumber}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderBankAccountNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank account name"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.bankAccountName}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -702,93 +1026,16 @@ function VendorEditForm(props) {
           <Select
             labelId="backCountry"
             id="bankCountry"
-            value={params.bankCountry}
+            value={bankCountry}
             onChange={handleBankCountryChange}
             label="Bank Country"
+            style={{ height: 38 }}
           >
             {renderCountryList()}
           </Select>
           <FormHelperText>Select Bank Country</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderBankSwiftCodeNumberField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank Swift code"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.bankAccountSwiftCode}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderBankIBANField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank IBAN number"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.bankAccountIBAN}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderBankNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank name"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.bankName}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -809,20 +1056,25 @@ function VendorEditForm(props) {
           <RadioGroup
             aria-label="enforceGlobalPlatformPolicyContract"
             name="enforceGlobalPlatformPolicyContract"
-            value={params.enforceGlobalPlatformPolicyContract}
+            value={enforceGlobalPlatformPolicyContract}
             onChange={handleGlobalPolicyChange}
+            style={{ height: 38 }}
           >
             <Grid item container direction="row">
               <Grid item>
                 <FormControlLabel
-                  value={true}
+                  value={"true"}
                   control={<Radio />}
                   label="Yes"
                 />
               </Grid>
 
               <Grid item></Grid>
-              <FormControlLabel value={false} control={<Radio />} label="No" />
+              <FormControlLabel
+                value={"false"}
+                control={<Radio />}
+                label="No"
+              />
             </Grid>
           </RadioGroup>
         </FormControl>
@@ -847,19 +1099,24 @@ function VendorEditForm(props) {
           <RadioGroup
             aria-label="permittableMaximumNumberOfPaymentInstallments"
             name="permittableMaximumNumberOfPaymentInstallments"
-            value={params.permittableMaximumNumberOfPaymentInstallments}
+            value={permittableMaximumNumberOfPaymentInstallments}
             onChange={handleMaximumPaymentInstallmentChange}
+            style={{ height: 38 }}
           >
             <Grid item container direction="row">
               <Grid item>
-                <FormControlLabel value={1} control={<Radio />} label="One" />
+                <FormControlLabel value={"1"} control={<Radio />} label="One" />
               </Grid>
 
               <Grid item>
-                <FormControlLabel value={2} control={<Radio />} label="Two" />
+                <FormControlLabel value={"2"} control={<Radio />} label="Two" />
               </Grid>
               <Grid item>
-                <FormControlLabel value={3} control={<Radio />} label="Three" />
+                <FormControlLabel
+                  value={"3"}
+                  control={<Radio />}
+                  label="Three"
+                />
               </Grid>
             </Grid>
           </RadioGroup>
@@ -868,247 +1125,165 @@ function VendorEditForm(props) {
     );
   };
 
-  const renderAgreedInitialPercentagePaymentField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter initial % payment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.initialPaymentAgreedRemittablePercentage}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedDaysToPaymentRemittanceField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Days from payment to remittance"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.initialPaymentAgreedDaysToPaymentRemittance}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderPlatformPercentageChargeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Platform percentage charge"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.initialPaymentPlatformPercentageForRetention}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedSecondPercentagePaymentField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter second % payment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.secondPaymentAgreedRemittablePercentage}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedSecondDaysToPaymentRemittanceField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Days from payment to remittance"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.secondPaymentAgreedDaysToPaymentRemittance}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderSecondPlatformPercentageChargeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Platform percentage charge"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.secondPaymentPlatformPercentageForRetention}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedThirdPercentagePaymentField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter third % payment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.thirdPaymentAgreedRemittablePercentage}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedThirdDaysToPaymentRemittanceField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Days from payment to remittance"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.thirdPaymentAgreedDaysToPaymentRemittance}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderThirdPlatformPercentageChargeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Platform percentage charge"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        value={params.thirdPaymentPlatformPercentageForRetention}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    setLoading(true);
+    const data = {
+      vendorNumber: formValues["vendorNumber"]
+        ? formValues["vendorNumber"]
+        : params.vendorNumber,
+      name: formValues["name"] ? formValues["name"] : params.name,
+      description: formValues["description"]
+        ? formValues["description"]
+        : params.description,
+      type: vendorType,
+      vendorCountry: locationCountry,
+      location: {
+        locationAddress: formValues["locationAddress"]
+          ? formValues["locationAddress"]
+          : params.location.locationAddress,
+        locationCity: locationCity,
+        locationState: locationState,
+        locationCountry: locationCountry,
+        locationCoordinates: [],
+        officePhoneNumber: "",
+      },
+      contactPerson: {
+        contactPersonName: formValues["contactPersonName"]
+          ? formValues["contactPersonName"]
+          : params.contactPerson.contactPersonName,
+        contactPersonPhoneNumber: formValues["contactPersonPhoneNumber"]
+          ? formValues["contactPersonPhoneNumber"]
+          : params.contactPerson.contactPersonPhoneNumber,
+        contactPersonEmailAddress: formValues["contactPersonEmailAddress"]
+          ? formValues["contactPersonEmailAddress"]
+          : params.contactPerson.contactPersonEmailAddress,
+      },
+      bankDetails: {
+        bankName: formValues["bankName"]
+          ? formValues["bankName"]
+          : params.bankDetails.bankName,
+        bankAccountNumber: formValues["bankAccountNumber"]
+          ? formValues["bankAccountNumber"]
+          : params.bankDetails.bankAccountNumber,
+        bankAccountType: bankAccountType,
+        bankAccountName: formValues["bankAccountName"]
+          ? formValues["bankAccountName"]
+          : params.bankDetails.bankAccountName,
+        bankCountry: bankCountry,
+        bankAccountSwiftCode: formValues["bankAccountSwiftCode"]
+          ? formValues["bankAccountSwiftCode"]
+          : params.bankDetails.bankAccountSwiftCode,
+        bankAccountIBAN: formValues["bankAccountIBAN"]
+          ? formValues["bankAccountIBAN"]
+          : params.bankDetails.bankAccountIBAN,
+      },
+      contract: {
+        enforceGlobalPlatformPolicyContract:
+          enforceGlobalPlatformPolicyContract,
+        permittableMaximumNumberOfPaymentInstallments:
+          permittableMaximumNumberOfPaymentInstallments,
+        initialPaymentInstallment: {
+          initialPaymentAgreedRemittablePercentage: formValues[
+            "initialPaymentAgreedRemittablePercentage"
+          ]
+            ? formValues["initialPaymentAgreedRemittablePercentage"]
+            : params.contract.initialPaymentInstallment
+                .initialPaymentAgreedRemittablePercentage,
+          initialPaymentAgreedDaysToPaymentRemittance: formValues[
+            "initialPaymentAgreedDaysToPaymentRemittance"
+          ]
+            ? formValues["initialPaymentAgreedDaysToPaymentRemittance"]
+            : params.contract.initialPaymentInstallment
+                .initialPaymentAgreedDaysToPaymentRemittance,
+          initialPaymentPlatformPercentageForRetention: formValues[
+            "initialPaymentPlatformPercentageForRetention"
+          ]
+            ? formValues["initialPaymentPlatformPercentageForRetention"]
+            : params.contract.initialPaymentInstallment
+                .initialPaymentPlatformPercentageForRetention,
+        },
+        secondPaymentInstallment: {
+          secondPaymentAgreedRemittablePercentage: formValues[
+            "secondPaymentAgreedRemittablePercentage"
+          ]
+            ? formValues["secondPaymentAgreedRemittablePercentage"]
+            : params.contract.secondPaymentInstallment
+                .secondPaymentAgreedRemittablePercentage,
+          secondPaymentAgreedDaysToPaymentRemittance: formValues[
+            "secondPaymentAgreedDaysToPaymentRemittance"
+          ]
+            ? formValues["secondPaymentAgreedDaysToPaymentRemittance"]
+            : params.contract.secondPaymentInstallment
+                .secondPaymentAgreedDaysToPaymentRemittance,
+          secondPaymentPlatformPercentageForRetention: formValues[
+            "secondPaymentPlatformPercentageForRetention"
+          ]
+            ? formValues["secondPaymentPlatformPercentageForRetention"]
+            : params.contract.secondPaymentInstallment
+                .secondPaymentPlatformPercentageForRetention,
+        },
+        thirdPaymentInstallment: {
+          thirdPaymentAgreedRemittablePercentage: formValues[
+            "thirdPaymentAgreedRemittablePercentage"
+          ]
+            ? formValues["thirdPaymentAgreedRemittablePercentage"]
+            : params.contract.thirdPaymentInstallment
+                .thirdPaymentAgreedRemittablePercentage,
+          thirdPaymentAgreedDaysToPaymentRemittance: formValues[
+            "thirdPaymentAgreedDaysToPaymentRemittance"
+          ]
+            ? formValues["thirdPaymentAgreedDaysToPaymentRemittance"]
+            : params.contract.thirdPaymentInstallment
+                .thirdPaymentAgreedDaysToPaymentRemittance,
+          thirdPaymentPlatformPercentageForRetention: formValues[
+            "thirdPaymentPlatformPercentageForRetention"
+          ]
+            ? formValues["thirdPaymentPlatformPercentageForRetention"]
+            : params.contract.thirdPaymentInstallment
+                .thirdPaymentPlatformPercentageForRetention,
+        },
+      },
+    };
+
+    if (data) {
+      const editForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+
+        const response = await api.patch(`/vendors/${params.id}`, data);
+
+        if (response.data.status === "success") {
+          dispatch({
+            type: EDIT_VENDOR,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulEditSnackbar(
+            `${response.data.data.data.name} Vendor is updated successfully!!!`
+          );
+          props.handleEditDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      editForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
+  };
+
+  const buttonContent = () => {
+    return <React.Fragment>Submit</React.Fragment>;
   };
 
   return (
     <div className={classes.root}>
-      <form id="vendorCategory" className={classes.formStyles}>
+      <form id="vendorEditForm" className={classes.formStyles}>
         <Grid container style={{ marginTop: 20 }} justifyContent="center">
           <FormLabel
             style={{ color: "blue", fontSize: "1.5em" }}
@@ -1129,6 +1304,7 @@ function VendorEditForm(props) {
             label=""
             id="name"
             name="name"
+            defaultValue={params.name}
             type="text"
             component={renderNameField}
             autoComplete="off"
@@ -1139,6 +1315,7 @@ function VendorEditForm(props) {
             label=""
             id="description"
             name="description"
+            defaultValue={params.description}
             type="text"
             component={renderDescriptionField}
           />
@@ -1149,7 +1326,6 @@ function VendorEditForm(props) {
                 label=""
                 id="type"
                 name="type"
-                type="text"
                 component={renderTypeRadioField}
               />
             </Grid>
@@ -1165,6 +1341,7 @@ function VendorEditForm(props) {
                   label=""
                   id="locationAddress"
                   name="locationAddress"
+                  defaultValue={params.location.locationAddress}
                   type="text"
                   component={renderVendorAddressField}
                 />
@@ -1175,7 +1352,6 @@ function VendorEditForm(props) {
                     label=""
                     id="locationCountry"
                     name="locationCountry"
-                    type="text"
                     component={renderVendorLocationCountryField}
                   />
                 </Grid>
@@ -1184,7 +1360,6 @@ function VendorEditForm(props) {
                     label=""
                     id="locationState"
                     name="locationState"
-                    type="text"
                     component={renderVendorLocationStateField}
                   />
                 </Grid>
@@ -1194,7 +1369,6 @@ function VendorEditForm(props) {
                     label=""
                     id="locationCity"
                     name="locationCity"
-                    type="text"
                     component={renderVendorLocationCityField}
                   />
                 </Grid>
@@ -1204,7 +1378,7 @@ function VendorEditForm(props) {
                   label=""
                   id="contactPersonName"
                   name="contactPersonName"
-                  type="text"
+                  defaultValue={params.contactPerson.contactPersonName}
                   component={renderVendorContactNameField}
                 />
               </Grid>
@@ -1214,7 +1388,7 @@ function VendorEditForm(props) {
                     label=""
                     id="contactPersonPhoneNumber"
                     name="contactPersonPhoneNumber"
-                    type="text"
+                    defaultValue={params.contactPerson.contactPersonPhoneNumber}
                     component={renderVendorPhoneNumberField}
                   />
                 </Grid>
@@ -1223,6 +1397,9 @@ function VendorEditForm(props) {
                     label=""
                     id="contactPersonEmailAddress"
                     name="contactPersonEmailAddress"
+                    defaultValue={
+                      params.contactPerson.contactPersonEmailAddress
+                    }
                     type="email"
                     component={renderVendorEmailAddressField}
                   />
@@ -1240,7 +1417,6 @@ function VendorEditForm(props) {
                   label=""
                   id="bankAccountType"
                   name="bankAccountType"
-                  type="text"
                   component={renderBankAccountTypeField}
                   className={classes.dropDown}
                 />
@@ -1250,6 +1426,7 @@ function VendorEditForm(props) {
                   label=""
                   id="bankAccountNumber"
                   name="bankAccountNumber"
+                  defaultValue={params.bankDetails.bankAccountNumber}
                   type="text"
                   component={renderBankAccountNumberField}
                 />
@@ -1259,6 +1436,7 @@ function VendorEditForm(props) {
                   label=""
                   id="bankAccountName"
                   name="bankAccountName"
+                  defaultValue={params.bankDetails.bankAccountName}
                   type="text"
                   component={renderBankAccountNameField}
                 />
@@ -1270,7 +1448,6 @@ function VendorEditForm(props) {
                   label=""
                   id="bankCountry"
                   name="bankCountry"
-                  type="text"
                   component={renderBankCountryField}
                 />
               </Grid>
@@ -1279,6 +1456,7 @@ function VendorEditForm(props) {
                   label=""
                   id="bankAccountSwiftCode"
                   name="bankAccountSwiftCode"
+                  defaultValue={params.bankDetails.bankAccountSwiftCode}
                   type="text"
                   component={renderBankSwiftCodeNumberField}
                 />
@@ -1288,6 +1466,7 @@ function VendorEditForm(props) {
                   label=""
                   id="bankAccountIBAN"
                   name="bankAccountIBAN"
+                  defaultValue={params.bankDetails.bankAccountIBAN}
                   type="text"
                   component={renderBankIBANField}
                 />
@@ -1298,6 +1477,7 @@ function VendorEditForm(props) {
                 label=""
                 id="bankName"
                 name="bankName"
+                defaultValue={params.bankDetails.bankName}
                 type="text"
                 component={renderBankNameField}
               />
@@ -1314,6 +1494,7 @@ function VendorEditForm(props) {
                 label=""
                 id="enforceGlobalPlatformPolicyContract"
                 name="enforceGlobalPlatformPolicyContract"
+                // type="text"
                 component={renderEnforceGlobalPlatformPolicyField}
               />
             </Grid>
@@ -1322,7 +1503,11 @@ function VendorEditForm(props) {
                 label=""
                 id="permittableMaximumNumberOfPaymentInstallments"
                 name="permittableMaximumNumberOfPaymentInstallments"
-                type="number"
+                defaultValue={
+                  params.contract.initialPaymentInstallment
+                    .permittableMaximumNumberOfPaymentInstallments
+                }
+                //type="number"
                 component={rendermaxNumberOfPaymentInstallmentAllowed}
               />
             </Grid>
@@ -1336,6 +1521,10 @@ function VendorEditForm(props) {
                     label="Enter agreed initial percentage payment"
                     id="initialPaymentAgreedRemittablePercentage"
                     name="initialPaymentAgreedRemittablePercentage"
+                    defaultValue={
+                      params.contract.initialPaymentInstallment
+                        .initialPaymentAgreedRemittablePercentage
+                    }
                     type="number"
                     component={renderAgreedInitialPercentagePaymentField}
                   />
@@ -1348,6 +1537,10 @@ function VendorEditForm(props) {
                     label="Enter agreed number of days to remittance"
                     id="initialPaymentAgreedDaysToPaymentRemittance"
                     name="initialPaymentAgreedDaysToPaymentRemittance"
+                    defaultValue={
+                      params.contract.initialPaymentInstallment
+                        .initialPaymentAgreedDaysToPaymentRemittance
+                    }
                     type="number"
                     component={renderAgreedDaysToPaymentRemittanceField}
                   />
@@ -1360,6 +1553,10 @@ function VendorEditForm(props) {
                     label="Enter Platform Percentage Charge"
                     id="initialPaymentPlatformPercentageForRetention"
                     name="initialPaymentPlatformPercentageForRetention"
+                    defaultValue={
+                      params.contract.initialPaymentInstallment
+                        .initialPaymentPlatformPercentageForRetention
+                    }
                     type="number"
                     component={renderPlatformPercentageChargeField}
                   />
@@ -1376,6 +1573,10 @@ function VendorEditForm(props) {
                     label="Enter agreed initial percentage payment"
                     id="secondPaymentAgreedRemittablePercentage"
                     name="secondPaymentAgreedRemittablePercentage"
+                    defaultValue={
+                      params.contract.secondPaymentInstallment
+                        .secondPaymentAgreedRemittablePercentage
+                    }
                     type="number"
                     component={renderAgreedSecondPercentagePaymentField}
                   />
@@ -1388,6 +1589,10 @@ function VendorEditForm(props) {
                     label="Enter agreed number of days to remittance"
                     id="secondPaymentAgreedDaysToPaymentRemittance"
                     name="secondPaymentAgreedDaysToPaymentRemittance"
+                    defaultValue={
+                      params.contract.secondPaymentInstallment
+                        .secondPaymentAgreedDaysToPaymentRemittance
+                    }
                     type="number"
                     component={renderAgreedSecondDaysToPaymentRemittanceField}
                   />
@@ -1400,6 +1605,10 @@ function VendorEditForm(props) {
                     label="Enter Platform Percentage Charge"
                     id="secondPaymentPlatformPercentageForRetention"
                     name="secondPaymentPlatformPercentageForRetention"
+                    defaultValue={
+                      params.contract.secondPaymentInstallment
+                        .secondPaymentPlatformPercentageForRetention
+                    }
                     type="number"
                     component={renderSecondPlatformPercentageChargeField}
                   />
@@ -1416,6 +1625,10 @@ function VendorEditForm(props) {
                     label="Enter agreed initial percentage payment"
                     id="thirdPaymentAgreedRemittablePercentage"
                     name="thirdPaymentAgreedRemittablePercentage"
+                    defaultValue={
+                      params.contract.thirdPaymentInstallment
+                        .thirdPaymentAgreedRemittablePercentage
+                    }
                     type="number"
                     component={renderAgreedThirdPercentagePaymentField}
                   />
@@ -1428,6 +1641,10 @@ function VendorEditForm(props) {
                     label="Enter agreed number of days to remittance"
                     id="thirdPaymentAgreedDaysToPaymentRemittance"
                     name="thirdPaymentAgreedDaysToPaymentRemittance"
+                    defaultValue={
+                      params.contract.thirdPaymentInstallment
+                        .thirdPaymentAgreedDaysToPaymentRemittance
+                    }
                     type="number"
                     component={renderAgreedThirdDaysToPaymentRemittanceField}
                   />
@@ -1440,6 +1657,10 @@ function VendorEditForm(props) {
                     label="Enter Platform Percentage Charge"
                     id="thirdPaymentPlatformPercentageForRetention"
                     name="thirdPaymentPlatformPercentageForRetention"
+                    defaultValue={
+                      params.contract.thirdPaymentInstallment
+                        .thirdPaymentPlatformPercentageForRetention
+                    }
                     type="number"
                     component={renderThirdPlatformPercentageChargeField}
                   />
@@ -1452,7 +1673,12 @@ function VendorEditForm(props) {
             className={classes.submitButton}
             onClick={props.handleSubmit(onSubmit)}
           >
-            Update Vendor
+            {/* Update Vendor */}
+            {loading ? (
+              <CircularProgress size={30} color="inherit" />
+            ) : (
+              buttonContent()
+            )}
           </Button>
         </Box>
       </form>
@@ -1461,5 +1687,5 @@ function VendorEditForm(props) {
 }
 
 export default reduxForm({
-  form: "vendorForm",
+  form: "vendorEditForm",
 })(VendorEditForm);

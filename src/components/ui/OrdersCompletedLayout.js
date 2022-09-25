@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
+import Snackbar from "@material-ui/core/Snackbar";
 
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -22,7 +23,8 @@ import OrderBySourceAndDestinationCountryList from "./../orders/OrderBySourceAnd
 import OrderBySourceCountryList from "../orders/OrderBySourceCountryList";
 import OrderByDestinationCountryList from "./../orders/OrderByDestinationCountryList";
 import OrderByCategoryAndSourceCountryList from "../orders/OrderByCategoryAndSourceCountryList";
-import OrderCompletedList from "../orders/OrderCompletedList";
+import OrderOnCompletionList from "../orderOnCompletion/OrderOnCompletionList";
+import OrderOnCompletionCreateForm from "../orderOnCompletion/OrderOnCompletionCreateForm";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   addButton: {
     borderRadius: 10,
     height: 30,
-    width: 130,
+    width: 210,
     marginLeft: 10,
     marginTop: 2,
     marginBottom: 5,
@@ -71,6 +73,11 @@ const useStyles = makeStyles((theme) => ({
 function OrdersCompletedLayout(props) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    backgroundColor: "",
+  });
   const [selectedSourceCountry, setSelectedSourceCountry] = useState("all");
   const [selectedDestinationCountry, setSelectedDestinationCountry] =
     useState("all");
@@ -158,6 +165,24 @@ function OrdersCompletedLayout(props) {
     console.log("the selected vendor iseeeeeeee:", selectedCategory);
   };
 
+  const handleSuccessfulCreateSnackbar = (message) => {
+    // history.push("/categories/new");
+    setOpen({ open: false });
+    setAlert({
+      open: true,
+      message: message,
+      backgroundColor: "#4BB543",
+    });
+  };
+
+  const handleFailedSnackbar = (message) => {
+    setAlert({
+      open: true,
+      message,
+      backgroundColor: "#FF3232",
+    });
+    setOpen({ open: false });
+  };
   const status = "fullfilled";
 
   const renderDataList = () => {
@@ -166,7 +191,13 @@ function OrdersCompletedLayout(props) {
       selectedDestinationCountry === "all" &&
       selectedCategory === "all"
     ) {
-      return <OrderCompletedList token={props.token} status={status} />;
+      return (
+        <OrderOnCompletionList
+          token={props.token}
+          userId={props.userId}
+          status={status}
+        />
+      );
     } else if (
       selectedSourceCountry === "all" &&
       selectedDestinationCountry === "all" &&
@@ -295,13 +326,16 @@ function OrdersCompletedLayout(props) {
         >
           <Toolbar disableGutters className={classes.toolbar}>
             <Grid item>
-              {/* <Button
+              <Button
                 variant="contained"
                 className={classes.addButton}
-                onClick={() => [setOpen(true), history.push("/orders/new")]}
+                onClick={() => [
+                  setOpen(true),
+                  history.push("/orders/completed/new"),
+                ]}
               >
-                Add Order
-              </Button> */}
+                Mark Order As Completed
+              </Button>
             </Grid>
             <Grid item></Grid>
           </Toolbar>
@@ -315,12 +349,15 @@ function OrdersCompletedLayout(props) {
         //style={{ zIndex: 1302 }}
         fullScreen={matchesXS}
         open={open}
-        onClose={() => [setOpen(false), history.push("/orders")]}
+        onClose={() => [setOpen(false), history.push("/orders/completed")]}
       >
         <DialogContent>
-          <OrderFormContainer
+          <OrderOnCompletionCreateForm
             token={props.token}
+            userId={props.userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
+            handleSuccessfulCreateSnackbar={handleSuccessfulCreateSnackbar}
+            handleFailedSnackbar={handleFailedSnackbar}
           />
         </DialogContent>
       </Dialog>
@@ -342,6 +379,16 @@ function OrdersCompletedLayout(props) {
           <Typography>This is the fourth Inner Container</Typography>
         </Grid>
       </Grid>
+      <Snackbar
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{
+          style: { backgroundColor: alert.backgroundColor },
+        }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => setAlert({ ...alert, open: false })}
+        autoHideDuration={4000}
+      />
     </Grid>
   );
 }

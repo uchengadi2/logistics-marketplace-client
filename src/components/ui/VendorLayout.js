@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
+import Snackbar from "@material-ui/core/Snackbar";
 
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -10,10 +11,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import history from "../../history";
 import VendorList from "../vendors/VendorList";
-import VendorFormContainer from "./../vendors/VendorFormContainer";
+
 import CountrySelectField from "./CountrySelectField";
 import data from "./../../apis/local";
 import VendorsByCountryList from "../vendors/VendorsByCountryList";
+import VendorForm from "../vendors/VendorForm";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -66,6 +68,11 @@ const useStyles = makeStyles((theme) => ({
 function VendorLayout(props) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    backgroundColor: "",
+  });
   const [value, setValue] = useState("all");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [countryList, setCountryList] = useState([{ id: "", name: "" }]);
@@ -98,6 +105,25 @@ function VendorLayout(props) {
 
   const handleCountryChange = (value) => {
     setSelectedCountry(value);
+  };
+
+  const handleSuccessfulCreateSnackbar = (message) => {
+    // history.push("/categories/new");
+    setOpen({ open: false });
+    setAlert({
+      open: true,
+      message: message,
+      backgroundColor: "#4BB543",
+    });
+  };
+
+  const handleFailedSnackbar = (message) => {
+    setAlert({
+      open: true,
+      message,
+      backgroundColor: "#FF3232",
+    });
+    setOpen({ open: false });
   };
 
   const renderDataList = () => {
@@ -159,10 +185,12 @@ function VendorLayout(props) {
         onClose={() => [setOpen(false), history.push("/vendors")]}
       >
         <DialogContent>
-          <VendorFormContainer
+          <VendorForm
             token={props.token}
             userId={props.userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
+            handleSuccessfulCreateSnackbar={handleSuccessfulCreateSnackbar}
+            handleFailedSnackbar={handleFailedSnackbar}
           />
         </DialogContent>
       </Dialog>
@@ -184,6 +212,16 @@ function VendorLayout(props) {
           <Typography>This is the fourth Inner Container</Typography>
         </Grid>
       </Grid>
+      <Snackbar
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{
+          style: { backgroundColor: alert.backgroundColor },
+        }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => setAlert({ ...alert, open: false })}
+        autoHideDuration={4000}
+      />
     </Grid>
   );
 }

@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Field, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import { TextField } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
@@ -15,6 +17,8 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import api from "./../../apis/local";
+import { CREATE_USER } from "../../actions/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,48 +42,189 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderEmailField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter user email address"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      style={{ marginTop: 15 }}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderPasswordField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter user password"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      style={{ marginTop: 15 }}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConfirmPasswordField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Re-enter password for confirmation"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+      style={{ marginTop: 15 }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the name of the user"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      // value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      style={{ marginTop: 15 }}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
 function UserForm(props) {
   const classes = useStyles();
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState();
   const [type, setType] = useState("staff");
-  const [value, setValue] = useState();
-  const [selectedRole, setSelectedRole] = useState();
+  const [loading, setLoading] = useState(false);
+  const [vendorList, setVendorList] = useState([]);
+  const [vendor, setVendor] = useState();
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchVendorData = async () => {
+      let allData = [{ id: "all", name: "All" }];
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/vendors");
+      const workingData = response.data.data.data;
+      workingData.map((vendor) => {
+        allData.push({
+          id: vendor._id,
+          name: `${vendor.vendorNumber} - ${vendor.name}`,
+        });
+      });
+      setVendorList(allData);
+    };
+
+    //call the function
+
+    fetchVendorData().catch(console.error);
+  }, []);
 
   const handleUserRoleChange = (event) => {
     setRole(event.target.value);
-    setSelectedRole(event.target.value);
   };
 
   const handleTypeChange = (event) => {
-    setValue(event.target.value);
+    setType(event.target.value);
   };
 
-  const renderNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the name of the user"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        // value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        style={{ marginTop: 15 }}
-        {...input}
+  const handleVendorChange = (event) => {
+    setVendor(event.target.value);
+  };
 
-        //onChange={handleInput}
-      />
-    );
+  //get the country list
+  const renderVendorList = () => {
+    return vendorList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
   };
 
   const renderUserRoleField = ({
@@ -97,11 +242,10 @@ function UserForm(props) {
           <Select
             labelId="role"
             id="role"
-            value={role ? role : selectedRole}
+            value={role}
             onChange={handleUserRoleChange}
             label="Role"
-            style={{ marginTop: 15, width: 500 }}
-            {...input}
+            style={{ marginTop: 15, width: 500, height: 38 }}
           >
             <MenuItem value={"admin"}>Admin</MenuItem>
             <MenuItem value={"user"}>User</MenuItem>
@@ -112,90 +256,6 @@ function UserForm(props) {
           <FormHelperText>Select User Role</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderEmailField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter user email address"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        style={{ marginTop: 15 }}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderPasswordField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter user password"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        style={{ marginTop: 15 }}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConfirmPasswordField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Re-enter password for confirmation"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-        style={{ marginTop: 15 }}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -216,9 +276,8 @@ function UserForm(props) {
           <RadioGroup
             aria-label="type"
             name="type"
-            value={value}
+            value={type}
             onChange={handleTypeChange}
-            {...input}
           >
             <Grid item container direction="row">
               <Grid item>
@@ -249,29 +308,90 @@ function UserForm(props) {
       </Box>
     );
   };
+
+  const renderVendorField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl variant="outlined">
+          {/* <InputLabel id="vendor_city">City</InputLabel> */}
+          <Select
+            labelId="vendor"
+            id="vendor"
+            value={vendor}
+            onChange={handleVendorChange}
+            label="Vendor"
+            style={{ height: 38, width: 500 }}
+          >
+            {renderVendorList()}
+          </Select>
+          <FormHelperText>Select Vendor</FormHelperText>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const buttonContent = () => {
+    return <React.Fragment> Submit</React.Fragment>;
+  };
+
   const onSubmit = (formValues) => {
-    console.log("this is the formvakues:", formValues);
+    setLoading(true);
     const data = {
       name: formValues.name,
       email: formValues.email,
-      role: formValues.role,
+      role: role,
       password: formValues.password,
       passwordConfirm: formValues.passwordConfirm,
-      type: formValues.type,
+      type: type,
+      vendor: vendor,
     };
+    console.log("the data is:", data);
+    if (data) {
+      const createForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.post(`/users`, data);
 
-    console.log("this is the data:", data);
-    props.onSubmit(data);
+        if (response.data.status === "success") {
+          dispatch({
+            type: CREATE_USER,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulCreateSnackbar(
+            `${response.data.data.data.name} User is added successfully!!!`
+          );
+          props.handleDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      createForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   return (
     <div className={classes.root}>
       <Grid item container justifyContent="center">
         <FormLabel
-          style={{ color: "blue", fontSize: "1.5em" }}
+          style={{ color: "grey", fontSize: "1.3em" }}
           component="legend"
         >
-          Enter New User Details
+          New User Details
         </FormLabel>
       </Grid>
       <Box
@@ -302,8 +422,8 @@ function UserForm(props) {
         />
         <Field
           label=""
-          id="confirmPassword"
-          name="confirmPassword"
+          id="passwordConfirm"
+          name="passwordConfirm"
           type="password"
           component={renderConfirmPasswordField}
         />
@@ -318,15 +438,6 @@ function UserForm(props) {
               component={renderNameField}
             />
           </Grid>
-          {/* <Grid item style={{ width: "33%", marginLeft: 10 }}>
-            <Field
-              label=""
-              id="cityCode"
-              name="cityCode"
-              type="text"
-              component={renderCityCodeField}
-            />
-          </Grid> */}
         </Grid>
 
         <Field
@@ -341,7 +452,15 @@ function UserForm(props) {
           label=""
           id="type"
           name="type"
+          type="text"
           component={renderTypeRadioField}
+        />
+        <Field
+          label=""
+          id="vendor"
+          name="vendor"
+          type="text"
+          component={renderVendorField}
         />
 
         <Button
@@ -349,7 +468,11 @@ function UserForm(props) {
           className={classes.submitButton}
           onClick={props.handleSubmit(onSubmit)}
         >
-          Submit
+          {loading ? (
+            <CircularProgress size={30} color="inherit" />
+          ) : (
+            buttonContent()
+          )}
         </Button>
       </Box>
       {/* </form> */}

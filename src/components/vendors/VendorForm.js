@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Field, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -17,9 +19,10 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import CircularProgress from "@material-ui/core/CircularProgress";
 
-import data from "./../../apis/local";
+import { CREATE_VENDOR } from "../../actions/types";
+
+import api from "./../../apis/local";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,16 +52,647 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderAgreedInitialPercentagePaymentField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter initial % payment"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedDaysToPaymentRemittanceField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Days from payment to remittance"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderPlatformPercentageChargeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Platform percentage charge"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedSecondPercentagePaymentField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter second % payment"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedSecondDaysToPaymentRemittanceField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Days from payment to remittance"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderSecondPlatformPercentageChargeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Platform percentage charge"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedThirdPercentagePaymentField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter third % payment"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderAgreedThirdDaysToPaymentRemittanceField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Days from payment to remittance"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderThirdPlatformPercentageChargeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Platform percentage charge"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the name of the Vendor"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderDescriptionField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Describe the Vendor"
+      label={label}
+      id={input.name}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={4}
+      {...custom}
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderImageField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      id={input.name}
+      variant="outlined"
+      type={type}
+      fullWidth
+      style={{ marginTop: 20 }}
+      helperText="Upload Category Image"
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderVendorAddressField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the Vendor Address Location"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      multiline={true}
+      minRows={2}
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVendorContactNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the contact Person's Name"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVendorPhoneNumberField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the contact person's phone numbers"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVendorEmailAddressField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the contact Person's email address"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankAccountNumberField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank account number"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankAccountNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank account name"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankSwiftCodeNumberField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank Swift code"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankIBANField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank IBAN number"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderBankNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the bank name"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
 function VendorForm(props) {
   const classes = useStyles();
-  const [locationCity, setLocationCity] = useState("");
-  const [locationState, setLocationState] = useState("");
-  const [locationCountry, setLocationCountry] = useState("");
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
-  const [countryStateList, setCountryStateList] = useState([]);
-  const [stateCityList, setStateCityList] = useState([]);
-  const [bankCountry, setBankCountry] = useState("");
+  const [locationCity, setLocationCity] = useState();
+  const [locationState, setLocationState] = useState();
+  const [locationCountry, setLocationCountry] = useState();
+
+  const [bankCountry, setBankCountry] = useState();
   const [cityList, setCityList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [countryList, setCountryList] = useState([]);
@@ -76,11 +710,13 @@ function VendorForm(props) {
 
   //spool the vendor document & data
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/countries");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/countries");
       const workingData = response.data.data.data;
       workingData.map((country) => {
         allData.push({ id: country._id, name: country.name });
@@ -96,8 +732,10 @@ function VendorForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/states");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/states", {
+        params: { country: locationCountry },
+      });
 
       const workingData = response.data.data.data;
       workingData.map((state) => {
@@ -109,13 +747,15 @@ function VendorForm(props) {
     //call the function
 
     fetchData().catch(console.error);
-  }, []);
+  }, [locationCountry]);
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/cities");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/cities", {
+        params: { state: locationState },
+      });
       const workingData = response.data.data.data;
       workingData.map((city) => {
         allData.push({ id: city._id, name: city.name });
@@ -126,7 +766,7 @@ function VendorForm(props) {
     //call the function
 
     fetchData().catch(console.error);
-  }, []);
+  }, [locationState]);
 
   const handleVendorTypeChange = (event) => {
     setVendorType(event.target.value);
@@ -163,19 +803,6 @@ function VendorForm(props) {
     setPermittableMaximumNumberOfPaymentInstallments(event.target.value);
   };
 
-  // const newParams = Object.values(params);
-  // const contactPersonName = ((params || {}).contactPerson || {})
-  //   .contactPersonName;
-
-  // const percentageAmountForThirdInstallmentPayment = (
-  //   (params || {}).contract ||
-  //   {}.thirdPaymentInstallment ||
-  //   {}
-  // ).percentageAmountForThirdInstallmentPayment;
-
-  console.log("this is the selected location country:", locationCountry);
-
-  console.log("this is th countrylist:", countryList);
   //get the city list
   const renderCityList = () => {
     return cityList.map((item) => {
@@ -209,81 +836,6 @@ function VendorForm(props) {
     });
   };
 
-  const renderNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the name of the Vendor"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Describe the Vendor"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={8}
-        {...custom}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderImageField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        id={input.name}
-        variant="outlined"
-        type={type}
-        fullWidth
-        {...input}
-        style={{ marginTop: 20 }}
-        helperText="Upload Category Image"
-      />
-    );
-  };
-
   const renderTypeRadioField = ({
     input,
     label,
@@ -303,7 +855,7 @@ function VendorForm(props) {
             name="type"
             value={vendorType}
             onChange={handleVendorTypeChange}
-            {...input}
+            style={{ height: 38 }}
           >
             <Grid item container direction="row">
               <Grid item>
@@ -327,34 +879,6 @@ function VendorForm(props) {
     );
   };
 
-  const renderVendorAddressField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the Vendor Address Location"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        multiline={true}
-        minRows={2}
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
   const renderVendorLocationCityField = ({
     input,
     label,
@@ -373,7 +897,7 @@ function VendorForm(props) {
             value={locationCity}
             onChange={handleLocationCityChange}
             label="City"
-            {...input}
+            style={{ height: 38 }}
           >
             {renderCityList()}
           </Select>
@@ -401,7 +925,7 @@ function VendorForm(props) {
             value={locationState}
             onChange={handleLocationStateChange}
             label="State"
-            {...input}
+            style={{ height: 38 }}
           >
             {renderStateList()}
           </Select>
@@ -429,91 +953,13 @@ function VendorForm(props) {
             value={locationCountry}
             onChange={handleLocationCountryChange}
             label="Country"
-            {...input}
+            style={{ height: 38 }}
           >
             {renderCountryList()}
           </Select>
           <FormHelperText>Select Country</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderVendorContactNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the contact Person's Name"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVendorPhoneNumberField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the contact person's phone numbers"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVendorEmailAddressField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the contact Person's email address"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -535,7 +981,7 @@ function VendorForm(props) {
             value={bankAccountType}
             onChange={handleAccountTypeChange}
             label="Account Type"
-            {...input}
+            style={{ height: 38 }}
           >
             <MenuItem value={"savings"}>Savings</MenuItem>
             <MenuItem value={"current"}>Current</MenuItem>
@@ -544,58 +990,6 @@ function VendorForm(props) {
           <FormHelperText>Select Account Type</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderBankAccountNumberField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank account number"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderBankAccountNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank account name"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -617,91 +1011,13 @@ function VendorForm(props) {
             value={bankCountry}
             onChange={handleBankCountryChange}
             label="Bank Country"
-            {...input}
+            style={{ height: 38 }}
           >
             {renderCountryList()}
           </Select>
           <FormHelperText>Select Bank Country</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderBankSwiftCodeNumberField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank Swift code"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderBankIBANField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank IBAN number"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderBankNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the bank name"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -724,7 +1040,7 @@ function VendorForm(props) {
             name="enforceGlobalPlatformPolicyContract"
             value={enforceGlobalPlatformPolicyContract}
             onChange={handleGlobalPolicyChange}
-            {...input}
+            style={{ height: 38 }}
           >
             <Grid item container direction="row">
               <Grid item>
@@ -767,7 +1083,7 @@ function VendorForm(props) {
             name="permittableMaximumNumberOfPaymentInstallments"
             value={permittableMaximumNumberOfPaymentInstallments}
             onChange={handleMaximumPaymentInstallmentChange}
-            {...input}
+            style={{ height: 38 }}
           >
             <Grid item container direction="row">
               <Grid item>
@@ -791,276 +1107,41 @@ function VendorForm(props) {
     );
   };
 
-  const renderAgreedInitialPercentagePaymentField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter initial % payment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedDaysToPaymentRemittanceField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Days from payment to remittance"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderPlatformPercentageChargeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Platform percentage charge"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedSecondPercentagePaymentField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter second % payment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedSecondDaysToPaymentRemittanceField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Days from payment to remittance"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderSecondPlatformPercentageChargeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Platform percentage charge"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedThirdPercentagePaymentField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter third % payment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderAgreedThirdDaysToPaymentRemittanceField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Days from payment to remittance"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderThirdPlatformPercentageChargeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Platform percentage charge"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
   const onSubmit = (formValues) => {
-    setLoading(false);
+    setLoading(true);
     const data = {
       vendorNumber: Math.floor(Math.random() * 100000000),
       name: formValues["name"],
-      description: formValues["description"] || "",
-      type: formValues["vendorType"],
-      vendorCountry: formValues["locationCountry"],
+      description: formValues["description"],
+      type: vendorType,
+      vendorCountry: locationCountry,
       location: {
-        locationAddress: formValues["locationAddress"] || "",
-        locationCity: formValues["locationCity"],
-        locationState: formValues["locationState"],
-        locationCountry: formValues["locationCountry"],
+        locationAddress: formValues["locationAddress"],
+        locationCity: locationCity,
+        locationState: locationState,
+        locationCountry: locationCountry,
         locationCoordinates: [],
         officePhoneNumber: "",
       },
       contactPerson: {
-        contactPersonName: formValues["contactPersonName"] || "",
-        contactPersonPhoneNumber: formValues["contactPersonPhoneNumber"] || "",
-        contactPersonEmailAddress:
-          formValues["contactPersonEmailAddress"] || "",
+        contactPersonName: formValues["contactPersonName"],
+        contactPersonPhoneNumber: formValues["contactPersonPhoneNumber"],
+        contactPersonEmailAddress: formValues["contactPersonEmailAddress"],
       },
       bankDetails: {
         bankName: formValues["bankName"],
         bankAccountNumber: formValues["bankAccountNumber"],
-        bankAccountType: formValues["bankAccountType"],
+        bankAccountType: bankAccountType,
         bankAccountName: formValues["bankAccountName"],
-        bankCountry: formValues["bankCountry"],
-        bankAccountSwiftCode: formValues["bankAccountSwiftCode"] || "",
-        bankAccountIBAN: formValues["bankAccountIBAN"] || "",
+        bankCountry: bankCountry,
+        bankAccountSwiftCode: formValues["bankAccountSwiftCode"],
+        bankAccountIBAN: formValues["bankAccountIBAN"],
       },
       contract: {
         enforceGlobalPlatformPolicyContract:
-          formValues["enforceGlobalPlatformPolicyContract"],
+          enforceGlobalPlatformPolicyContract,
         permittableMaximumNumberOfPaymentInstallments:
-          formValues["permittableMaximumNumberOfPaymentInstallments"],
+          permittableMaximumNumberOfPaymentInstallments,
         initialPaymentInstallment: {
           initialPaymentAgreedRemittablePercentage:
             formValues["initialPaymentAgreedRemittablePercentage"] || 0,
@@ -1088,8 +1169,35 @@ function VendorForm(props) {
       },
     };
 
-    props.onSubmit(data);
-    setLoading(true);
+    if (data) {
+      const createForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.post(`/vendors`, data);
+
+        if (response.data.status === "success") {
+          dispatch({
+            type: CREATE_VENDOR,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulCreateSnackbar(
+            `${response.data.data.data.name} Vendor is added successfully!!!`
+          );
+          props.handleDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      createForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   const buttonContent = () => {

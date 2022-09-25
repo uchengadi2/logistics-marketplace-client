@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Field, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -17,7 +19,8 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import data from "./../../apis/local";
+import api from "./../../apis/local";
+import { CREATE_PRODUCT } from "../../actions/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,6 +47,297 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderVechicleNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Vehicle Label"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVehicleUniqueIdField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Vehicle Unique Number"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderMultilineField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  helperText,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText={helperText}
+      label={label}
+      id={input.name}
+      // value={formInput.description}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={5}
+      {...custom}
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderLatituteField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the address location latitute"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderLongtituteField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the address location longtitude"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderVehicleMakeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Vehicle Make"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderVehicleModelField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Vehicle model"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderVehicleChassisField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Vehicle Chasis"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderImageCoverField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  delete input.value;
+  return (
+    <TextField
+      id={input.name}
+      variant="outlined"
+      type={type}
+      name={input.name}
+      fullWidth
+      style={{ marginTop: 20 }}
+      helperText="Upload Vehicle Image Cover"
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderProductImagesField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  delete input.value;
+  return (
+    <TextField
+      id={input.name}
+      variant="outlined"
+      type={type}
+      name={input.name}
+      fullWidth
+      style={{ marginTop: 20 }}
+      //onChange={onImageChange}
+      helperText="Upload This Vehicle Other Images (maximum of 5)"
+      {...input}
+      inputProps={{ multiple: true }}
+    />
+  );
+};
+
 function ProductForm(props) {
   const classes = useStyles();
   const [city, setCity] = useState("");
@@ -56,12 +350,15 @@ function ProductForm(props) {
   const [selectedVendor, setSelectedVendor] = useState();
   const [selectedCity, setSelectedCity] = useState();
   const [selectedCategory, setSelectedCategory] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get(`/cities`);
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get(`/cities`);
       const workingData = response.data.data.data;
       workingData.map((city) => {
         allData.push({ id: city._id, name: city.name });
@@ -77,8 +374,8 @@ function ProductForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get(`/categories`);
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get(`/categories`);
       const workingData = response.data.data.data;
       workingData.map((category) => {
         allData.push({ id: category._id, name: category.name });
@@ -94,8 +391,8 @@ function ProductForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get(`/vendors`);
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get(`/vendors`);
       const workingData = response.data.data.data;
       workingData.map((vendor) => {
         allData.push({ id: vendor._id, name: vendor.name });
@@ -179,12 +476,12 @@ function ProductForm(props) {
             value={vendor}
             onChange={handleVendorChange}
             label="Vendor"
-            style={{ width: 500, marginTop: 10 }}
-            {...input}
+            style={{ width: 500, marginTop: 10, height: 38 }}
+            //{...input}
           >
             {renderVendorList()}
           </Select>
-          <FormHelperText>Select Vendor</FormHelperText>
+          <FormHelperText>Vendor</FormHelperText>
         </FormControl>
       </Box>
     );
@@ -208,155 +505,14 @@ function ProductForm(props) {
             value={category}
             onChange={handleCategoryChange}
             label="Category"
-            style={{ marginTop: 20, width: 500 }}
-            {...input}
+            style={{ marginTop: 20, width: 500, height: 38 }}
+            //{...input}
           >
             {renderCategoryList()}
           </Select>
-          <FormHelperText>Select Vehicle Category</FormHelperText>
+          <FormHelperText>Vehicle Category</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderVechicleNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the name of the Vehicle"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVehicleUniqueIdField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the unique number of the Vehicle"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderShortDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Enter the short description of the vehicle"
-        label={label}
-        id={input.name}
-        // value={formInput.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={4}
-        {...custom}
-        {...input}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderFullDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Enter the full description of the vehicle"
-        label={label}
-        id={input.name}
-        // value={formInput.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={12}
-        {...custom}
-        {...input}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVehiclePermanentAddressField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Enter the permanent address of this vehicle"
-        label={label}
-        id={input.name}
-        // value={formInput.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={4}
-        {...input}
-        {...custom}
-        // onChange={handleInput}
-      />
     );
   };
 
@@ -374,232 +530,83 @@ function ProductForm(props) {
           {/* <InputLabel id="vendor_city">City</InputLabel> */}
           <Select
             labelId="city"
-            id="city_id"
+            id="city"
             value={city}
             onChange={handleCityChange}
             label="City"
-            style={{ marginTop: 20, width: 500 }}
-            {...input}
+            style={{ marginTop: 20, width: 500, height: 38 }}
+            //{...input}
           >
             {renderCityList()}
           </Select>
-          <FormHelperText>
-            Select the city of the permanent address
-          </FormHelperText>
+          <FormHelperText>Current Location</FormHelperText>
         </FormControl>
       </Box>
     );
   };
 
-  const renderLatituteField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the address location latitute"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderLongtituteField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the address location longtitude"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVehicleMakeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the vehicle make"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVehicleModelField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the vehicle model"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderVehicleChassisField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the vehicle Chasis"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderImageCoverField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    delete input.value;
-    return (
-      <TextField
-        id={input.name}
-        variant="outlined"
-        type={type}
-        name={input.name}
-        fullWidth
-        style={{ marginTop: 20 }}
-        //onChange={onImageChange}
-        helperText="Upload Vehicle Image Cover"
-        {...input}
-      />
-    );
-  };
-
-  const renderProductImagesField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    delete input.value;
-    return (
-      <TextField
-        id={input.name}
-        variant="outlined"
-        type={type}
-        name={input.name}
-        fullWidth
-        style={{ marginTop: 20 }}
-        //onChange={onImageChange}
-        helperText="Upload This Vehicle Other Images (maximum of 5)"
-        {...input}
-        inputProps={{ multiple: true }}
-      />
-    );
+  const buttonContent = () => {
+    return <React.Fragment> Submit</React.Fragment>;
   };
 
   const onSubmit = (formValues) => {
+    setLoading(true);
+
     const form = new FormData();
     form.append("name", formValues.name);
     form.append("shortDescription", formValues.shortDescription);
     form.append("fullDescription", formValues.fullDescription);
-    form.append("plateNumber", formValues.plateNumber);
-    form.append("category", formValues.category);
-    form.append("vendor", formValues.vendor);
+
+    form.append("category", category);
+    form.append("vendor", vendor);
     form.append("createdBy", props.userId);
-    form.append("features.make", formValues.make);
-    form.append("features.model", formValues.model);
-    form.append("features.chassis", formValues.chassis);
 
-    form.append(
-      "permanentLocation.permanentLocationAddress",
-      formValues.permanentLocationAddress
-    );
+    form.append("make", formValues.make);
+    form.append("model", formValues.model);
+    form.append("chassis", formValues.chassis);
+    form.append("address", formValues.address);
+    form.append("city", city);
 
-    form.append("permanentLocation.city", formValues.city);
+    if (!formValues["plateNumber"]) {
+      const refNum =
+        "PR" + "-" + Math.floor(Math.random() * 100000000) + "-" + "VHL";
+
+      form.append("plateNumber", refNum);
+    }
 
     if (formValues.imageCover) {
       form.append("imageCover", formValues.imageCover[0]);
     }
 
-    props.onSubmit(form);
+    if (formValues) {
+      const createForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.post(`/products`, form);
+
+        if (response.data.status === "success") {
+          dispatch({
+            type: CREATE_PRODUCT,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulCreateSnackbar(
+            `${response.data.data.data.name} Vehicle is added successfully!!!`
+          );
+          props.handleDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      createForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   return (
@@ -607,10 +614,10 @@ function ProductForm(props) {
       <form id="productForm" className={classes.formStyles}>
         <Grid item container style={{ marginTop: 20 }} justifyContent="center">
           <FormLabel
-            style={{ color: "blue", fontSize: "1.5em" }}
+            style={{ color: "grey", fontSize: "1.3em" }}
             component="legend"
           >
-            <Typography variant="h5">Enter Vehicle Details</Typography>
+            <Typography variant="h5">Add Vehicle</Typography>
           </FormLabel>
         </Grid>
         <Box
@@ -651,15 +658,17 @@ function ProductForm(props) {
             label=""
             id="shortDescription"
             name="shortDescription"
+            helperText="Short Description"
             type="text"
-            component={renderShortDescriptionField}
+            component={renderMultilineField}
           />
           <Field
             label=""
             id="fullDescription"
             name="fullDescription"
             type="text"
-            component={renderFullDescriptionField}
+            helperText="Full Description"
+            component={renderMultilineField}
           />
 
           <Field
@@ -676,10 +685,11 @@ function ProductForm(props) {
           </Grid>
           <Field
             label=""
-            id="permanentLocationAddress"
-            name="permanentLocationAddress"
+            id="address"
+            name="address"
+            helperText="Address"
             type="text"
-            component={renderVehiclePermanentAddressField}
+            component={renderMultilineField}
           />
           <Field
             label=""
@@ -688,28 +698,7 @@ function ProductForm(props) {
             type="text"
             component={renderLocationCityField}
           />
-          {/* <Grid container direction="row" style={{ marginTop: 20 }}>
-            <Grid item>
-              <Field
-                label=""
-                id="permanentLocationLatitude"
-                name="permanentLocationLatitude"
-                type="number"
-                component={renderLatituteField}
-                style={{ width: 220 }}
-              />
-            </Grid>
-            <Grid item>
-              <Field
-                label=""
-                id="permanentLocationLongitide"
-                name="permanentLocationLongitide"
-                type="number"
-                component={renderLongtituteField}
-                style={{ width: 250, marginLeft: 30 }}
-              />
-            </Grid>
-          </Grid> */}
+
           <Grid container direction="row" style={{ marginTop: 20 }}>
             <Grid item style={{ width: "30%" }}>
               <Field
@@ -756,7 +745,11 @@ function ProductForm(props) {
             className={classes.submitButton}
             onClick={props.handleSubmit(onSubmit)}
           >
-            Submit
+            {loading ? (
+              <CircularProgress size={30} color="inherit" />
+            ) : (
+              buttonContent()
+            )}
           </Button>
         </Box>
       </form>

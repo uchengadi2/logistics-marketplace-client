@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function OrdersLayout({ token }) {
+function OrdersLayout({ token, userId }) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
@@ -132,16 +132,16 @@ function OrdersLayout({ token }) {
         />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <OrdersPendingLayout token={token} />
+        <OrdersPendingLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <OrdersAssignedLayout token={token} />
+        <OrdersAssignedLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <OrdersOnTransitLayout token={token} />
+        <OrdersOnTransitLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <OrdersCompletedLayout token={token} />
+        <OrdersCompletedLayout token={token} userId={userId} />
       </TabPanel>
       <TabPanel value={value} index={4}>
         {/* <ClustersLayout token={token} /> */}

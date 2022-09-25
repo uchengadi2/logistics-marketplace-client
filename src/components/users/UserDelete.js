@@ -16,6 +16,8 @@ class UserDelete extends React.Component {
     const handleDelete = () => {
       this.props.deleteUser(this.props.id, this.props.token);
       this.props.handleDialogOpenStatus();
+      console.log("the user probs:", this.props.id);
+      console.log("this token:", this.props.token);
     };
 
     const handleNoDelete = () => {

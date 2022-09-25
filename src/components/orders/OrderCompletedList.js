@@ -14,6 +14,7 @@ import DataGridContainer from "../DataGridContainer";
 import OrderAssignmentFormContainer from "./OrderAssignmentFormContainer";
 import OrdersEdit from "./OrdersEdit";
 import OrderDelete from "./OrdersDelete";
+import OrdersShow from "./OrdersShow";
 
 class orderCompletedList extends React.Component {
   constructor(props) {
@@ -54,7 +55,7 @@ class orderCompletedList extends React.Component {
           ]}
         >
           <DialogContent>
-            <OrdersEdit
+            <OrdersShow
               token={this.props.token}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
@@ -133,10 +134,10 @@ class orderCompletedList extends React.Component {
     let rows = [];
     let counter = 0;
     const columns = [
-      { field: "numbering", headerName: "S/n", width: 60 },
-      { field: "orderNumber", headerName: "Order Number", width: 150 },
+      { field: "numbering", headerName: "S/n", width: 80 },
+      { field: "orderNumber", headerName: "Order Number", width: 100 },
       { field: "dateOrdered", headerName: "Date Ordered", width: 100 },
-      { field: "orderedQuantity", headerName: "Ordered Quantity", width: 80 },
+      { field: "orderQuantity", headerName: "Ordered Quantity", width: 100 },
       { field: "status", headerName: "Status", width: 100 },
       { field: "category", headerName: "Category", width: 150 },
       {
@@ -170,24 +171,24 @@ class orderCompletedList extends React.Component {
           </strong>
         ),
       },
-      {
-        field: "cancelorder",
-        headerName: "",
-        width: 30,
-        description: "Cancel Order",
-        renderCell: (params) => (
-          <strong>
-            {/* {params.value.getFullYear()} */}
-            <CancelRoundedIcon
-              style={{ color: "black" }}
-              onClick={() => [
-                this.setState({ cancelOpen: true, id: params.id }),
-                history.push(`/orders/fullfilled/cancel/${params.id}`),
-              ]}
-            />
-          </strong>
-        ),
-      },
+      // {
+      //   field: "cancelorder",
+      //   headerName: "",
+      //   width: 30,
+      //   description: "Cancel Order",
+      //   renderCell: (params) => (
+      //     <strong>
+      //       {/* {params.value.getFullYear()} */}
+      //       <CancelRoundedIcon
+      //         style={{ color: "black" }}
+      //         onClick={() => [
+      //           this.setState({ cancelOpen: true, id: params.id }),
+      //           history.push(`/orders/fullfilled/cancel/${params.id}`),
+      //         ]}
+      //       />
+      //     </strong>
+      //   ),
+      // },
       // {
       //   field: "assignorder",
       //   headerName: "",
@@ -206,37 +207,41 @@ class orderCompletedList extends React.Component {
       //     </strong>
       //   ),
       // },
-      {
-        field: "deleteaction",
-        headerName: "",
-        width: 30,
-        description: "Delete row",
-        renderCell: (params) => (
-          <strong>
-            {/* {params.value.getFullYear()} */}
-            <DeleteRoundedIcon
-              style={{ color: "red" }}
-              onClick={() => [
-                this.setState({ deleteOpen: true, id: params.id }),
-                history.push(`/orders/fullfilled/delete/${params.id}`),
-              ]}
-            />
-          </strong>
-        ),
-      },
+      // {
+      //   field: "deleteaction",
+      //   headerName: "",
+      //   width: 30,
+      //   description: "Delete row",
+      //   renderCell: (params) => (
+      //     <strong>
+      //       {/* {params.value.getFullYear()} */}
+      //       <DeleteRoundedIcon
+      //         style={{ color: "red" }}
+      //         onClick={() => [
+      //           this.setState({ deleteOpen: true, id: params.id }),
+      //           history.push(`/orders/fullfilled/delete/${params.id}`),
+      //         ]}
+      //       />
+      //     </strong>
+      //   ),
+      // },
     ];
     this.props.orders.map((order) => {
-      console.log("these are the orderrrrnew:", order);
       let row = {
         numbering: ++counter,
         id: order.id,
         orderNumber: order.orderNumber,
         dateOrdered: order.dateOrdered,
-        orderedQuantity: order.orderQuantity,
+        orderQuantity: order.orderQuantity,
         status: order.status,
-        consignmentCountry: order.consignmentCountry[0],
-        destinationCountry: order.destinationCountry[0],
+        consignmentCountry: order.consignmentCountry,
+        destinationCountry: order.destinationCountry,
         category: order.category,
+        orderedBy: order.orderedBy,
+        consignment: order.consignment,
+        sourceLocation: order.sourceLocation,
+        destinationLocation: order.destinationLocation,
+        logisticsInsurancetype: order.logisticsInsurancetype,
       };
       rows.push(row);
     });

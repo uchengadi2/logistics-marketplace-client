@@ -24,6 +24,7 @@ import paymentPartialReducer from "./paymentPartialReducer";
 import remittanceReducer from "./remittanceReducer";
 import remittancesCompleteReducer from "./remittancesCompleteReducer";
 import RemittancesPartialReducer from "./remittancesPartialReducer";
+import orderOnCompletionReducer from "./orderOnCompletionReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -32,7 +33,7 @@ export default combineReducers({
   city: cityReducer,
   order: orderReducer,
   orderAssigned: ordersAssignedReducer,
-  orderCompleted: ordersCompletedReducer,
+  orderCompleted: orderOnCompletionReducer,
   orderOnTransit: orderOnTransitReducer,
   payment: paymentReducer,
   policy: policyReducer,

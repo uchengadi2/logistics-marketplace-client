@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Field, formValueSelector, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -17,7 +19,8 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import data from "./../../apis/local";
+import api from "./../../apis/local";
+import { CREATE_CITY } from "../../actions/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,20 +44,111 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the name of the city"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderCityCodeField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the code for this City"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderDescriptionField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Describe the city"
+      label={label}
+      id={input.name}
+      // value={formInput.description}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={5}
+      {...custom}
+      onChange={input.onChange}
+
+      // onChange={handleInput}
+    />
+  );
+};
+
 function CityForm(props) {
   const classes = useStyles();
   const [state, setState] = useState("");
   const [country, setCountry] = useState("");
   const [countryList, setCountryList] = useState([]);
   const [stateList, setStateList] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState();
-  const [selectedState, setSelectedState] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/countries");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/countries");
       const workingData = response.data.data.data;
       workingData.map((country) => {
         allData.push({ id: country._id, name: country.name });
@@ -70,9 +164,9 @@ function CityForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get(`/states`, {
-        params: { country: selectedCountry },
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get(`/states`, {
+        params: { country: country },
       });
       const workingData = response.data.data.data;
       workingData.map((state) => {
@@ -84,16 +178,14 @@ function CityForm(props) {
     //call the function
 
     fetchData().catch(console.error);
-  }, [selectedCountry]);
+  }, [country]);
 
   const handleStateChange = (event) => {
     setState(event.target.value);
-    setSelectedState(event.target.value);
   };
 
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
-    setSelectedCountry(event.target.value);
     setStateList([]);
   };
 
@@ -119,60 +211,6 @@ function CityForm(props) {
     });
   };
 
-  const renderNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the name of the city"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderCityCodeField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the code for this City"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={formInput.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        {...input}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
   const renderStateField = ({
     input,
     label,
@@ -191,8 +229,7 @@ function CityForm(props) {
             value={state}
             onChange={handleStateChange}
             label="State"
-            style={{ marginTop: 20, width: 500 }}
-            {...input}
+            style={{ marginTop: 20, width: 500, height: 38 }}
           >
             {renderStateList()}
           </Select>
@@ -222,8 +259,7 @@ function CityForm(props) {
             value={country}
             onChange={handleCountryChange}
             label="Country"
-            style={{ marginTop: 20, width: 500 }}
-            {...input}
+            style={{ marginTop: 20, width: 500, height: 38 }}
           >
             {renderCountryList()}
           </Select>
@@ -233,52 +269,58 @@ function CityForm(props) {
     );
   };
 
-  const renderDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Describe the city"
-        label={label}
-        id={input.name}
-        // value={formInput.description}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={3}
-        {...custom}
-        {...input}
-        // onChange={handleInput}
-      />
-    );
+  const buttonContent = () => {
+    return <React.Fragment> Submit</React.Fragment>;
   };
 
   const onSubmit = (formValues) => {
+    setLoading(true);
     const data = {
       name: formValues.name,
-      code: formValues.code || " ",
-      description: formValues.description || " ",
-      country: formValues.country,
-      state: formValues.state,
+      code: formValues.code
+        ? formValues.code
+        : "CT-" + Math.floor(Math.random() * 100000),
+      description: formValues.description,
+      country: country,
+      state: state,
       createdBy: props.userId,
     };
-    props.onSubmit(data);
+    if (data) {
+      const createForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.post(`/cities`, data);
+
+        if (response.data.status === "success") {
+          dispatch({
+            type: CREATE_CITY,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulCreateSnackbar(
+            `${response.data.data.data.name} City is added successfully!!!`
+          );
+          props.handleDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      createForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   return (
     <div className={classes.root}>
       <Grid item container justifyContent="center">
         <FormLabel
-          style={{ color: "blue", fontSize: "1.5em" }}
+          style={{ color: "grey", fontSize: "1.3em" }}
           component="legend"
         >
           Enter City Details
@@ -346,7 +388,11 @@ function CityForm(props) {
           className={classes.submitButton}
           onClick={props.handleSubmit(onSubmit)}
         >
-          Submit
+          {loading ? (
+            <CircularProgress size={30} color="inherit" />
+          ) : (
+            buttonContent()
+          )}
         </Button>
       </Box>
       {/* </form> */}

@@ -24,11 +24,23 @@ import {
   CREATE_VENDOR,
   FETCH_VENDORS,
   FETCH_ASSIGNED_ORDERS,
-  FETCH_COMPLETED_ORDERS,
+  CREATE_ASSIGNED_ORDER,
+  FETCH_ASSIGNED_ORDER,
+  EDIT_ASSIGNED_ORDER,
+  DELETE_ASSIGNED_ORDER,
   FETCH_ONTRANSIT_ORDERS,
+  EDIT_ONTRANSIT_ORDER,
+  DELETE_ONTRANSIT_ORDER,
+  FETCH_ONTRANSIT_ORDER,
+  CREATE_ONTRANSIT_ORDER,
   FETCH_VENDOR,
   DELETE_VENDOR,
   EDIT_VENDOR,
+  FETCH_COMPLETED_ORDERS,
+  FETCH_COMPLETED_ORDER,
+  EDIT_COMPLETED_ORDER,
+  DELETE_COMPLETED_ORDER,
+  CREATE_COMPLETED_ORDER,
   CREATE_PRODUCT,
   FETCH_PRODUCTS,
   FETCH_PRODUCT,
@@ -375,16 +387,16 @@ export const editProduct = (id, formValues, token) => {
   return async (dispatch) => {
     const response = await data.patch(`/products/${id}`, formValues);
     dispatch({ type: EDIT_PRODUCT, payload: response.data });
-    history.push("/products");
   };
 };
 
 export const deleteProduct = (id, token) => {
+  console.log("this token:", token);
+  console.log("the id is:", id);
   data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   return async (dispatch) => {
     await data.delete(`/products/${id}`);
     dispatch({ type: DELETE_PRODUCT, payload: id });
-    history.push("/products");
   };
 };
 
@@ -457,41 +469,34 @@ export const fetchOrders = (tokens, status) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${tokens}`;
   return async (dispatch) => {
     const response = await data.get("/orders", { params: { status: status } });
-    console.log("the orders issssssnew:", response);
     dispatch({ type: FETCH_ORDERS, payload: response.data.data.data });
   };
 };
 
-export const fetchAssignedOrders = (tokens, status) => {
+export const fetchAssignedOrders = (tokens) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${tokens}`;
   return async (dispatch) => {
-    const response = await data.get("/orders", { params: { status: status } });
-    console.log("the orders issssssnew:", response);
+    const response = await data.get("/orderassignments");
     dispatch({ type: FETCH_ASSIGNED_ORDERS, payload: response.data.data.data });
   };
 };
 
-export const fetchCompletedOrders = (tokens, status) => {
+export const fetchOnTransitOrders = (tokens) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${tokens}`;
   return async (dispatch) => {
-    const response = await data.get("/orders", { params: { status: status } });
-    console.log("the orders issssssnew:", response);
+    const response = await data.get("/orderontransits");
     dispatch({
-      type: FETCH_COMPLETED_ORDERS,
+      type: FETCH_ONTRANSIT_ORDERS,
       payload: response.data.data.data,
     });
   };
 };
 
-export const fetchOnTransitOrders = (tokens, status) => {
+export const fetchAssignedOrder = (id, tokens) => {
   data.defaults.headers.common["Authorization"] = `Bearer ${tokens}`;
   return async (dispatch) => {
-    const response = await data.get("/orders", { params: { status: status } });
-    console.log("the orders issssssnew:", response);
-    dispatch({
-      type: FETCH_ONTRANSIT_ORDERS,
-      payload: response.data.data.data,
-    });
+    const response = await data.get(`/orderassignments/${id}`);
+    dispatch({ type: FETCH_ASSIGNED_ORDER, payload: response.data.data.data });
   };
 };
 
@@ -508,7 +513,22 @@ export const editOrder = (id, formValues, token) => {
   return async (dispatch) => {
     const response = await data.patch(`/orders/${id}`, formValues);
     dispatch({ type: EDIT_ORDER, payload: response.data });
-    history.push("/orders");
+  };
+};
+
+export const editAssignedOrder = (id, formValues, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.patch(`/orderassignments/${id}`, formValues);
+    dispatch({ type: EDIT_ASSIGNED_ORDER, payload: response.data });
+  };
+};
+
+export const deleteAssignedOrder = (id, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    await data.delete(`/orderassignments/${id}`);
+    dispatch({ type: DELETE_ASSIGNED_ORDER, payload: id });
   };
 };
 
@@ -527,6 +547,53 @@ export const assignOrder = (id, formValues, token) => {
     const response = await data.patch(`/orders/${id}`, formValues);
     dispatch({ type: EDIT_ORDER, payload: response.data });
     //history.push("/orders");
+  };
+};
+
+export const editOnTransitOrder = (id, formValues, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.patch(`/orderontransits/${id}`, formValues);
+    dispatch({ type: EDIT_ONTRANSIT_ORDER, payload: response.data });
+  };
+};
+
+export const deleteOnTransitOrder = (id, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    await data.delete(`/orderontransits/${id}`);
+    dispatch({ type: DELETE_ONTRANSIT_ORDER, payload: id });
+  };
+};
+
+export const fetchOnTransitOrder = (id, tokens) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${tokens}`;
+  return async (dispatch) => {
+    const response = await data.get(`/orderontransits/${id}`);
+    dispatch({ type: FETCH_ONTRANSIT_ORDER, payload: response.data.data.data });
+  };
+};
+
+//order resource crud operation
+export const createAssignedOrder = (formValues, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.post("/orderassignments", formValues);
+
+    dispatch({ type: CREATE_ASSIGNED_ORDER, payload: response.data.data.data });
+  };
+};
+
+//order resource crud operation
+export const createOnTransitOrder = (formValues, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.post("/orderontransits", formValues);
+
+    dispatch({
+      type: CREATE_ONTRANSIT_ORDER,
+      payload: response.data.data.data,
+    });
   };
 };
 
@@ -682,7 +749,7 @@ export const editCountry = (id, formValues, token) => {
   return async (dispatch) => {
     const response = await data.patch(`/countries/${id}`, formValues);
     dispatch({ type: EDIT_COUNTRY, payload: response.data });
-    history.push("/utility/countries");
+    // history.push("/utility/countries");
   };
 };
 
@@ -691,7 +758,7 @@ export const deleteCountry = (id, token) => {
   return async (dispatch) => {
     await data.delete(`/countries/${id}`);
     dispatch({ type: DELETE_COUNTRY, payload: id });
-    history.push("/utilities/countries");
+    // history.push("/utilities/countries");
   };
 };
 
@@ -736,7 +803,7 @@ export const editState = (id, formValues, token) => {
   return async (dispatch) => {
     const response = await data.patch(`/states/${id}`, formValues);
     dispatch({ type: EDIT_STATE, payload: response.data });
-    history.push("/utilities/states");
+    //history.push("/utilities/states");
   };
 };
 
@@ -1265,5 +1332,55 @@ export const deleteCompleteRemittance = (id, token) => {
     await data.delete(`/remittances/${id}`);
     dispatch({ type: DELETE_COMPLETE_REMITTANCE, payload: id });
     history.push("/remittances");
+  };
+};
+
+// //////////////////////////Fetch Completed Orders /////////////////////////////////
+
+export const fetchCompletedOrders = (tokens) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${tokens}`;
+  return async (dispatch) => {
+    const response = await data.get("/orderoncompletions");
+    dispatch({
+      type: FETCH_COMPLETED_ORDERS,
+      payload: response.data.data.data,
+    });
+  };
+};
+
+export const fetchCompletedOrder = (id, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.get(`/orderoncompletions/${id}`);
+    dispatch({ type: FETCH_COMPLETED_ORDER, payload: response.data });
+  };
+};
+
+export const editCompletedOrder = (id, formValues, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.patch(`/orderoncompletions/${id}`, formValues);
+    dispatch({ type: EDIT_COMPLETED_ORDER, payload: response.data });
+  };
+};
+
+export const deleteCompletedOrder = (id, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    await data.delete(`/orderoncompletions/${id}`);
+    dispatch({ type: DELETE_COMPLETED_ORDER, payload: id });
+  };
+};
+
+//create complete orders
+export const createCompletedOrder = (formValues, token) => {
+  data.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  return async (dispatch) => {
+    const response = await data.post("/orderoncompletions", formValues);
+
+    dispatch({
+      type: CREATE_COMPLETED_ORDER,
+      payload: response.data.data.data,
+    });
   };
 };

@@ -1,14 +1,15 @@
 import React from "react";
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
+import Snackbar from "@material-ui/core/Snackbar";
 import DialogContent from "@material-ui/core/DialogContent";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
 import Typography from "@material-ui/core/Typography";
 import history from "../../history";
 import { fetchCategories } from "../../actions";
-import CategoryEdit from "./CategoryEdit";
 import CategoryDelete from "./CategoryDelete";
+import CategoryEditForm from "./CategoryEditForm";
 import DataGridContainer from "../DataGridContainer";
 
 class CategoryList extends React.Component {
@@ -18,8 +19,13 @@ class CategoryList extends React.Component {
       editOpen: false,
       deleteOpen: false,
       id: null,
-      // params: { name: "", description: "" },
       params: {},
+
+      alert: {
+        open: false,
+        message: "",
+        backgroundColor: "",
+      },
     };
   }
   componentDidMount() {
@@ -36,6 +42,29 @@ class CategoryList extends React.Component {
     this.setState({ editOpen: false });
   };
 
+  handleSuccessfulEditSnackbar = (message) => {
+    // history.push("/categories/new");
+    this.setState({ editOpen: false });
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#4BB543",
+      },
+    });
+  };
+
+  handleFailedSnackbar = (message) => {
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#FF3232",
+      },
+    });
+    this.setState({ editOpen: false });
+  };
+
   renderEditDialogForm = () => {
     //token will be used here
     return (
@@ -49,11 +78,13 @@ class CategoryList extends React.Component {
           ]}
         >
           <DialogContent>
-            <CategoryEdit
+            <CategoryEditForm
               token={this.props.token}
               userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
+              handleSuccessfulEditSnackbar={this.handleSuccessfulEditSnackbar}
+              handleFailedSnackbar={this.handleFailedSnackbar}
             />
           </DialogContent>
         </Dialog>
@@ -158,6 +189,16 @@ class CategoryList extends React.Component {
         {this.renderDeleteDialogForm()}
         {this.renderEditDialogForm()}
         {this.renderList()}
+        <Snackbar
+          open={this.state.alert.open}
+          message={this.state.alert.message}
+          ContentProps={{
+            style: { backgroundColor: this.state.alert.backgroundColor },
+          }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => this.setState({ alert: { ...alert, open: false } })}
+          autoHideDuration={4000}
+        />
       </>
     );
   }

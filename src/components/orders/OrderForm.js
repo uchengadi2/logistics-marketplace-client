@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Field, reduxForm } from "redux-form";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import { TextField } from "@material-ui/core";
@@ -17,7 +19,8 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import data from "./../../apis/local";
+import api from "./../../apis/local";
+import { CREATE_ORDER } from "../../actions/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,6 +43,397 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+
+const renderConsignmentType = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter Consignment Type(eg container etc)"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderWeightinKg = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter Consignment Weight(in kg)"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConsignmentDescriptionField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Describe the consignment"
+      label={label}
+      id={input.name}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={5}
+      {...custom}
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderConsignmentSourceContactPerson = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter Contact Person Name"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConsignmentDestinationContactPerson = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter Contact Person Name"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConsignmentSourceContactPhoneNumber = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter Contact Person Number"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConsignmentDestinationContactPhoneNumber = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter Contact Person Number"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConsignmentOwnerField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the Name of the owner of this Consignment"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderOrderNumberField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Order Number"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderVehicleQuantityField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="How many vehicles do you need?"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConsignmentLocationAddressField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Enter the source address of this consignment"
+      label={label}
+      id={input.name}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={3}
+      {...custom}
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderConsignmentDestinationAddressField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Enter the destination address of this consignment"
+      label={label}
+      id={input.name}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={3}
+      {...custom}
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderOrderStatusField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Order Status"
+      variant="outlined"
+      //label={label}
+      id={input.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
 
 function OrderForm(props) {
   const classes = useStyles();
@@ -78,12 +472,15 @@ function OrderForm(props) {
   const [destinationCity, setDestinationCity] = useState();
   const [sourcePlaceType, setSourcePlaceType] = useState();
   const [destinationPlaceType, setDestinationPlaceType] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/users");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/users");
       const workingData = response.data.data.data;
       workingData.map((user) => {
         allData.push({ id: user._id, name: user.name });
@@ -99,8 +496,8 @@ function OrderForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/categories");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/categories");
       const workingData = response.data.data.data;
       workingData.map((category) => {
         allData.push({ id: category._id, name: category.name });
@@ -116,8 +513,8 @@ function OrderForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/countries");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/countries");
       const workingData = response.data.data.data;
       workingData.map((country) => {
         allData.push({ id: country._id, name: country.name });
@@ -133,8 +530,8 @@ function OrderForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/countries");
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/countries");
       const workingData = response.data.data.data;
       workingData.map((country) => {
         allData.push({ id: country._id, name: country.name });
@@ -150,8 +547,8 @@ function OrderForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/states", {
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/states", {
         params: { country: sourceCountry },
       });
       const workingData = response.data.data.data;
@@ -169,8 +566,8 @@ function OrderForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/states", {
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/states", {
         params: { country: destinationCountry },
       });
       const workingData = response.data.data.data;
@@ -188,8 +585,8 @@ function OrderForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/cities", {
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/cities", {
         params: { state: sourceState },
       });
       const workingData = response.data.data.data;
@@ -207,8 +604,8 @@ function OrderForm(props) {
   useEffect(() => {
     const fetchData = async () => {
       let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get("/cities", {
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/cities", {
         params: { state: destinationState },
       });
       const workingData = response.data.data.data;
@@ -222,8 +619,6 @@ function OrderForm(props) {
 
     fetchData().catch(console.error);
   }, [destinationState]);
-
-  console.log("this is the token at booking form:", props.token);
 
   const handleSourcePlaceTypeChange = (event) => {
     setSourcePlaceType(event.target.value);
@@ -393,96 +788,13 @@ function OrderForm(props) {
             value={category}
             onChange={handleCategoryChange}
             label="Category"
-            style={{ marginTop: 20, width: 280 }}
-            {...input}
+            style={{ marginTop: 20, width: 280, height: 38 }}
           >
             {renderCategoryList()}
           </Select>
           <FormHelperText>Select Vehicle Category</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderVehicleQuantityField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter number of vehicle(s) required"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentLocationAddressField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Enter the source address of this consignment"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={3}
-        {...custom}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentDestinationAddressField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Enter the destination address of this consignment"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={3}
-        {...custom}
-        // onChange={handleInput}
-      />
     );
   };
 
@@ -504,8 +816,7 @@ function OrderForm(props) {
             value={sourceCity}
             onChange={handleConsignmentSourceCityChange}
             label="Consignment Source City"
-            style={{ width: 150 }}
-            {...input}
+            style={{ width: 150, height: 38 }}
           >
             {renderSourceCityList()}
           </Select>
@@ -533,8 +844,7 @@ function OrderForm(props) {
             value={destinationCity}
             onChange={handleConsignmentDestinationCityChange}
             label="Consignment Destination City"
-            style={{ width: 150 }}
-            {...input}
+            style={{ width: 150, height: 38 }}
           >
             {renderDestinationCityList()}
           </Select>
@@ -562,8 +872,7 @@ function OrderForm(props) {
             value={sourceState}
             onChange={handleConsignmentSourceStateChange}
             label="Consignment Source State"
-            style={{ width: 150 }}
-            {...input}
+            style={{ width: 150, height: 38 }}
           >
             {renderSourceStateList()}
           </Select>
@@ -591,8 +900,7 @@ function OrderForm(props) {
             value={destinationState}
             onChange={handleConsignmentDestinationStateChange}
             label="Consignment Destination State"
-            style={{ width: 150 }}
-            {...input}
+            style={{ width: 150, height: 38 }}
           >
             {renderDestinationStateList()}
           </Select>
@@ -620,8 +928,7 @@ function OrderForm(props) {
             value={sourceCountry}
             onChange={handleConsignmentSourceCountryChange}
             label="Consignment Source Country"
-            style={{ width: 150 }}
-            {...input}
+            style={{ width: 150, height: 38 }}
           >
             {renderSourceCountryList()}
           </Select>
@@ -649,250 +956,13 @@ function OrderForm(props) {
             value={destinationCountry}
             onChange={handleConsignmentDestinationCountryChange}
             label="Consignment Destination Country"
-            style={{ width: 150 }}
-            {...input}
+            style={{ width: 150, height: 38 }}
           >
             {renderDestinationCountryList()}
           </Select>
           <FormHelperText>Select Destination Country </FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderConsignmentType = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Consignment Type(eg container etc)"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderWeightinKg = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Consignment Weight(in kg)"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Describe the consignment"
-        label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={5}
-        {...custom}
-        // onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentSourceContactPerson = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Contact Person Name"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentDestinationContactPerson = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Contact Person Name"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentSourceContactPhoneNumber = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Contact Person Number"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentDestinationContactPhoneNumber = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter Contact Person Number"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderConsignmentOwnerField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the Name of the owner of this Consignment"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
-    );
-  };
-
-  const renderOrderNumberField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Order Number"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -914,8 +984,7 @@ function OrderForm(props) {
             value={logisticsInsuranceType}
             onChange={handleLogisticsInsuranceTypeChange}
             label="Logistics Insurance Type"
-            style={{ width: 500, marginTop: 0 }}
-            {...input}
+            style={{ width: 500, marginTop: 0, height: 38 }}
           >
             <MenuItem value={"notApplicable"}>Not Applicable</MenuItem>
             <MenuItem value={"atSourceCountryOnly"}>
@@ -931,32 +1000,6 @@ function OrderForm(props) {
           <FormHelperText>Choose preferred Insurance Type </FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderOrderStatusField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Order Status"
-        variant="outlined"
-        //label={label}
-        id={input.name}
-        {...input}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -978,8 +1021,7 @@ function OrderForm(props) {
             value={sourcePlaceType}
             onChange={handleSourcePlaceTypeChange}
             label="Source Place Type"
-            style={{ width: 500, marginTop: 10 }}
-            {...input}
+            style={{ width: 500, marginTop: 10, height: 38 }}
           >
             <MenuItem value={"warehouse"}>Warehouse</MenuItem>
             <MenuItem value={"port"}>Port</MenuItem>
@@ -1026,8 +1068,7 @@ function OrderForm(props) {
             value={destinationPlaceType}
             onChange={handleDestinationPlaceTypeChange}
             label="Destination Place Type"
-            style={{ width: 500, marginTop: 10 }}
-            {...input}
+            style={{ width: 500, marginTop: 10, height: 38 }}
           >
             <MenuItem value={"warehouse"}>Warehouse</MenuItem>
             <MenuItem value={"port"}>Port</MenuItem>
@@ -1056,16 +1097,21 @@ function OrderForm(props) {
     );
   };
 
+  const buttonContent = () => {
+    return <React.Fragment> Place Order</React.Fragment>;
+  };
+
   const onSubmit = (formValues) => {
     //prepare the data for submission
     const data = {
-      orderNumber: Math.floor(Math.random() * 10000000000),
-      category: formValues["category"],
-      consignmentCountry: formValues["consignmentCountry"],
-      destinationCountry: formValues["consignmentDestinationCountry"],
+      orderNumber: "UD-" + Math.floor(Math.random() * 10000000000),
+      category: category,
+      consignmentCountry: sourceCountry,
+      destinationCountry: destinationCountry,
       orderQuantity: formValues["orderQuantity"],
+      totalUnassignedQuantity: formValues["orderQuantity"],
       orderedBy: props.userId,
-      logisticsInsurancetype: formValues["logisticsInsuranceType"],
+      logisticsInsurancetype: logisticsInsuranceType,
       consignment: {
         name: formValues["consignmentType"],
         description: formValues["consignmentDescription"],
@@ -1083,9 +1129,9 @@ function OrderForm(props) {
         sourceName: "",
         sourceDescription: "",
         sourceAddress: formValues["consignmentSourceAddress"],
-        sourceCity: formValues["sourceCity"],
-        sourceState: formValues["consignmentsourcestate"],
-        sourcePlaceType: formValues["sourcePlaceType"],
+        sourceCity: sourceCity,
+        sourceState: sourceState,
+        sourcePlaceType: sourcePlaceType,
         sourceCoordinates: [],
         // sourceLatitude: "",
         // sourceLongtitude: "",
@@ -1102,9 +1148,9 @@ function OrderForm(props) {
         destinationCoordinates: [],
         // destinationLatitude: "",
         // destinationLongtitude: "",
-        destinationCity: formValues["destinationCity"],
-        destinationState: formValues["consignmentDestinationState"],
-        destinationPlaceType: formValues["destinationPlaceType"],
+        destinationCity: destinationCity,
+        destinationState: destinationState,
+        destinationPlaceType: destinationPlaceType,
         destinationContactPerson: {
           destinationContactPersonName:
             formValues["destinationContactPersonName"],
@@ -1113,16 +1159,42 @@ function OrderForm(props) {
         },
       },
     };
-    props.onSubmit(data);
+    if (data) {
+      const createForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.post(`/orders`, data);
 
-    //props.handleBookingsOpenDialogStatus();
+        if (response.data.status === "success") {
+          dispatch({
+            type: CREATE_ORDER,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulCreateSnackbar(
+            `${response.data.data.data.orderNumber} Order is made successfully!!!`
+          );
+          props.handleDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      createForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   return (
     <div className={classes.root}>
       <Grid item container justifyContent="center">
         <FormLabel
-          style={{ color: "blue", fontSize: "1.5em" }}
+          style={{ color: "grey", fontSize: "1.3em" }}
           component="legend"
         >
           Order/Booking Details
@@ -1395,7 +1467,11 @@ function OrderForm(props) {
           className={classes.submitButton}
           onClick={props.handleSubmit(onSubmit)}
         >
-          Place Order
+          {loading ? (
+            <CircularProgress size={30} color="inherit" />
+          ) : (
+            buttonContent()
+          )}
         </Button>
       </Box>
       {/* </form> */}

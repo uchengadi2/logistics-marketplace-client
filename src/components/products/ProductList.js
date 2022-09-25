@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
+import Snackbar from "@material-ui/core/Snackbar";
 import DialogContent from "@material-ui/core/DialogContent";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
@@ -9,8 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import history from "../../history";
 import { fetchProducts } from "../../actions";
 import DataGridContainer from "../DataGridContainer";
-import ProductEdit from "./ProductEdit";
 import ProductDelete from "./ProductDelete";
+import ProductEditForm from "./ProductEditForm";
 
 class ProductList extends React.Component {
   constructor(props) {
@@ -21,6 +22,11 @@ class ProductList extends React.Component {
       blacklistOpen: false,
       id: null,
       params: {},
+      alert: {
+        open: false,
+        message: "",
+        backgroundColor: "",
+      },
     };
   }
   componentDidMount() {
@@ -37,6 +43,29 @@ class ProductList extends React.Component {
     this.setState({ editOpen: false });
   };
 
+  handleSuccessfulEditSnackbar = (message) => {
+    // history.push("/categories/new");
+    this.setState({ editOpen: false });
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#4BB543",
+      },
+    });
+  };
+
+  handleFailedSnackbar = (message) => {
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#FF3232",
+      },
+    });
+    this.setState({ editOpen: false });
+  };
+
   renderEditDialogForm = () => {
     //token will be used here
     return (
@@ -50,11 +79,13 @@ class ProductList extends React.Component {
           ]}
         >
           <DialogContent>
-            <ProductEdit
+            <ProductEditForm
               token={this.props.token}
               userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
+              handleSuccessfulEditSnackbar={this.handleSuccessfulEditSnackbar}
+              handleFailedSnackbar={this.handleFailedSnackbar}
             />
           </DialogContent>
         </Dialog>
@@ -178,7 +209,22 @@ class ProductList extends React.Component {
         id: product.id,
         name: product.name,
         description: product.fullDescription,
-        vendor: product.vendor[0],
+        vendor: product.vendor,
+        shortDescription: product.shortDescription,
+        fullDescription: product.fullDescription,
+        plateNumber: product.plateNumber,
+        imageCover: product.imageCover,
+        quantity: product.quantity,
+        make: product.make,
+        model: product.model,
+        chassis: product.chassis,
+        createdAt: product.createdAt,
+        createdBy: product.createdBy,
+        address: product.address,
+        city: product.city,
+        state: product.state,
+        country: product.country,
+        category: product.category,
       };
       rows.push(row);
     });
@@ -191,6 +237,16 @@ class ProductList extends React.Component {
         {this.renderEditDialogForm()}
         {this.renderProductList()}
         {this.renderBlackListDialogForm()}
+        <Snackbar
+          open={this.state.alert.open}
+          message={this.state.alert.message}
+          ContentProps={{
+            style: { backgroundColor: this.state.alert.backgroundColor },
+          }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => this.setState({ alert: { ...alert, open: false } })}
+          autoHideDuration={4000}
+        />
       </>
     );
   }

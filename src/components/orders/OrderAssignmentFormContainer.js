@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import AssignOrderForm from "./AssignOrderForm";
+import AssignOrderForm from "../assignedOrders/AssignOrderForm";
 import { assignOrder } from "./../../actions";
 
 class OrderAssignmentFormContainer extends React.Component {

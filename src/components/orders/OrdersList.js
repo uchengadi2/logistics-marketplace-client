@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
+import Snackbar from "@material-ui/core/Snackbar";
 import DialogContent from "@material-ui/core/DialogContent";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
@@ -13,6 +14,7 @@ import DataGridContainer from "../DataGridContainer";
 import OrderAssignmentFormContainer from "./OrderAssignmentFormContainer";
 import OrdersEdit from "./OrdersEdit";
 import OrderDelete from "./OrdersDelete";
+import OrderEditForm from "./OrderEditForm";
 
 class OrdersList extends React.Component {
   constructor(props) {
@@ -24,6 +26,11 @@ class OrdersList extends React.Component {
       assignOpen: false,
       id: null,
       params: {},
+      alert: {
+        open: false,
+        message: "",
+        backgroundColor: "",
+      },
     };
   }
   componentDidMount() {
@@ -40,6 +47,29 @@ class OrdersList extends React.Component {
     this.setState({ editOpen: false });
   };
 
+  handleSuccessfulEditSnackbar = (message) => {
+    // history.push("/categories/new");
+    this.setState({ editOpen: false });
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#4BB543",
+      },
+    });
+  };
+
+  handleFailedSnackbar = (message) => {
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#FF3232",
+      },
+    });
+    this.setState({ editOpen: false });
+  };
+
   renderEditDialogForm = () => {
     //token will be used here
     return (
@@ -53,10 +83,13 @@ class OrdersList extends React.Component {
           ]}
         >
           <DialogContent>
-            <OrdersEdit
+            <OrderEditForm
               token={this.props.token}
+              userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
+              handleSuccessfulEditSnackbar={this.handleSuccessfulEditSnackbar}
+              handleFailedSnackbar={this.handleFailedSnackbar}
             />
           </DialogContent>
         </Dialog>
@@ -79,6 +112,7 @@ class OrdersList extends React.Component {
           <DialogContent>
             <OrderDelete
               token={this.props.token}
+              userId={this.props.userId}
               id={this.state.id}
               handleDialogOpenStatus={this.handleDialogOpenStatus}
             />
@@ -136,22 +170,22 @@ class OrdersList extends React.Component {
     let rows = [];
     let counter = 0;
     const columns = [
-      { field: "numbering", headerName: "S/n", width: 60 },
+      { field: "numbering", headerName: "S/n", width: 100 },
       { field: "orderNumber", headerName: "Order Number", width: 150 },
-      { field: "dateOrdered", headerName: "Date Ordered", width: 100 },
-      { field: "orderedQuantity", headerName: "Ordered Quantity", width: 80 },
-      { field: "status", headerName: "Status", width: 100 },
+      { field: "dateOrdered", headerName: "Date Ordered", width: 150 },
+      { field: "orderedQuantity", headerName: "Ordered Quantity", width: 150 },
+      { field: "status", headerName: "Status", width: 150 },
       { field: "category", headerName: "Category", width: 150 },
-      {
-        field: "consignmentCountry",
-        headerName: "Source Country",
-        width: 150,
-      },
-      {
-        field: "destinationCountry",
-        headerName: "Destination Country",
-        width: 150,
-      },
+      // {
+      //   field: "consignmentCountry",
+      //   headerName: "Source Country",
+      //   width: 150,
+      // },
+      // {
+      //   field: "destinationCountry",
+      //   headerName: "Destination Country",
+      //   width: 150,
+      // },
       {
         field: "editaction",
         headerName: "",
@@ -173,42 +207,42 @@ class OrdersList extends React.Component {
           </strong>
         ),
       },
-      {
-        field: "cancelorder",
-        headerName: "",
-        width: 30,
-        description: "Cancel Order",
-        renderCell: (params) => (
-          <strong>
-            {/* {params.value.getFullYear()} */}
-            <CancelRoundedIcon
-              style={{ color: "black" }}
-              onClick={() => [
-                this.setState({ cancelOpen: true, id: params.id }),
-                history.push(`/orders/cancel/${params.id}`),
-              ]}
-            />
-          </strong>
-        ),
-      },
-      {
-        field: "assignorder",
-        headerName: "",
-        width: 30,
-        description: "Assign Order",
-        renderCell: (params) => (
-          <strong>
-            {/* {params.value.getFullYear()} */}
-            <AssignmentIcon
-              style={{ color: "black" }}
-              onClick={() => [
-                this.setState({ assignOpen: true, id: params.id }),
-                history.push(`/orders/assign/${params.id}`),
-              ]}
-            />
-          </strong>
-        ),
-      },
+      // {
+      //   field: "cancelorder",
+      //   headerName: "",
+      //   width: 30,
+      //   description: "Cancel Order",
+      //   renderCell: (params) => (
+      //     <strong>
+      //       {/* {params.value.getFullYear()} */}
+      //       <CancelRoundedIcon
+      //         style={{ color: "black" }}
+      //         onClick={() => [
+      //           this.setState({ cancelOpen: true, id: params.id }),
+      //           history.push(`/orders/cancel/${params.id}`),
+      //         ]}
+      //       />
+      //     </strong>
+      //   ),
+      // },
+      // {
+      //   field: "assignorder",
+      //   headerName: "",
+      //   width: 30,
+      //   description: "Assign Order",
+      //   renderCell: (params) => (
+      //     <strong>
+      //       {/* {params.value.getFullYear()} */}
+      //       <AssignmentIcon
+      //         style={{ color: "black" }}
+      //         onClick={() => [
+      //           this.setState({ assignOpen: true, id: params.id }),
+      //           history.push(`/orders/assign/${params.id}`),
+      //         ]}
+      //       />
+      //     </strong>
+      //   ),
+      // },
       {
         field: "deleteaction",
         headerName: "",
@@ -229,17 +263,21 @@ class OrdersList extends React.Component {
       },
     ];
     this.props.orders.map((order) => {
-      console.log("these are the orderrrrnew:", order);
       let row = {
         numbering: ++counter,
         id: order.id,
         orderNumber: order.orderNumber,
         dateOrdered: order.dateOrdered,
-        orderedQuantity: order.orderQuantity,
+        orderQuantity: order.orderQuantity,
         status: order.status,
         consignmentCountry: order.consignmentCountry,
         destinationCountry: order.destinationCountry,
         category: order.category,
+        orderedBy: order.orderedBy,
+        consignment: order.consignment,
+        sourceLocation: order.sourceLocation,
+        destinationLocation: order.destinationLocation,
+        logisticsInsurancetype: order.logisticsInsurancetype,
       };
       rows.push(row);
     });
@@ -254,6 +292,16 @@ class OrdersList extends React.Component {
         {this.renderOrdersList()}
         {this.renderCancelDialogForm()}
         {this.renderAssignOrderDialogForm()}
+        <Snackbar
+          open={this.state.alert.open}
+          message={this.state.alert.message}
+          ContentProps={{
+            style: { backgroundColor: this.state.alert.backgroundColor },
+          }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => this.setState({ alert: { ...alert, open: false } })}
+          autoHideDuration={4000}
+        />
       </>
     );
   }

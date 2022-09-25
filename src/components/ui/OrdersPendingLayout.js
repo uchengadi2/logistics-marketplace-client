@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
+import Snackbar from "@material-ui/core/Snackbar";
 
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -11,8 +12,6 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import history from "../../history";
 import OrdersList from "../orders/OrdersList";
 import OrderFormContainer from "../orders/OrderFormContainer";
-import OrderAssignmentFormContainer from "../orders/OrderAssignmentFormContainer";
-import CountryVendorSelectFields from "./CountryVendorSelectFields";
 import SourceCountryDestinationCountryAndCategoryFilters from "./filters/SourceCountryDestinationCountryAndCategoryFilters";
 import data from "./../../apis/local";
 import OrderByCategoryList from "../orders/OrderByCategoryList";
@@ -22,6 +21,7 @@ import OrderBySourceAndDestinationCountryList from "./../orders/OrderBySourceAnd
 import OrderBySourceCountryList from "../orders/OrderBySourceCountryList";
 import OrderByDestinationCountryList from "./../orders/OrderByDestinationCountryList";
 import OrderByCategoryAndSourceCountryList from "../orders/OrderByCategoryAndSourceCountryList";
+import OrderForm from "../orders/OrderForm";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,6 +70,11 @@ const useStyles = makeStyles((theme) => ({
 function OrdersPendingLayout(props) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    backgroundColor: "",
+  });
   const [selectedSourceCountry, setSelectedSourceCountry] = useState("all");
   const [selectedDestinationCountry, setSelectedDestinationCountry] =
     useState("all");
@@ -144,17 +149,33 @@ function OrdersPendingLayout(props) {
 
   const handleSourceCountryChange = (value) => {
     setSelectedSourceCountry(value);
-    console.log("the selected country iseeeeeeee:", selectedSourceCountry);
   };
 
   const handleDestinationCountryChange = (value) => {
     setSelectedDestinationCountry(value);
-    console.log("the selected country iseeeeeeee:", selectedDestinationCountry);
+  };
+
+  const handleSuccessfulCreateSnackbar = (message) => {
+    // history.push("/categories/new");
+    setOpen({ open: false });
+    setAlert({
+      open: true,
+      message: message,
+      backgroundColor: "#4BB543",
+    });
+  };
+
+  const handleFailedSnackbar = (message) => {
+    setAlert({
+      open: true,
+      message,
+      backgroundColor: "#FF3232",
+    });
+    setOpen({ open: false });
   };
 
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
-    console.log("the selected vendor iseeeeeeee:", selectedCategory);
   };
 
   const status = "pending";
@@ -165,7 +186,9 @@ function OrdersPendingLayout(props) {
       selectedDestinationCountry === "all" &&
       selectedCategory === "all"
     ) {
-      return <OrdersList token={props.token} status={status} />;
+      return (
+        <OrdersList token={props.token} status={status} userId={props.userId} />
+      );
     } else if (
       selectedSourceCountry === "all" &&
       selectedDestinationCountry === "all" &&
@@ -174,6 +197,7 @@ function OrdersPendingLayout(props) {
       return (
         <OrderByCategoryList
           token={props.token}
+          userId={props.userId}
           selectedCategory={selectedCategory}
           status={status}
         />
@@ -186,6 +210,7 @@ function OrdersPendingLayout(props) {
       return (
         <OrderByCategoryAndDestinationCountryList
           token={props.token}
+          userId={props.userId}
           selectedCategory={selectedCategory}
           selectedDestinationCountry={selectedDestinationCountry}
           status={status}
@@ -199,6 +224,7 @@ function OrdersPendingLayout(props) {
       return (
         <OrderByCategorySourceAndDestinationCountryList
           token={props.token}
+          userId={props.userId}
           selectedCategory={selectedCategory}
           selectedDestinationCountry={selectedDestinationCountry}
           selectedSourceCountry={selectedSourceCountry}
@@ -213,6 +239,7 @@ function OrdersPendingLayout(props) {
       return (
         <OrderBySourceAndDestinationCountryList
           token={props.token}
+          userId={props.userId}
           selectedDestinationCountry={selectedDestinationCountry}
           selectedSourceCountry={selectedSourceCountry}
           status={status}
@@ -226,6 +253,7 @@ function OrdersPendingLayout(props) {
       return (
         <OrderBySourceCountryList
           token={props.token}
+          userId={props.userId}
           selectedSourceCountry={selectedSourceCountry}
           status={status}
         />
@@ -238,6 +266,7 @@ function OrdersPendingLayout(props) {
       return (
         <OrderByDestinationCountryList
           token={props.token}
+          userId={props.userId}
           selectedDestinationCountry={selectedDestinationCountry}
           status={status}
         />
@@ -250,6 +279,7 @@ function OrdersPendingLayout(props) {
       return (
         <OrderByCategoryAndSourceCountryList
           token={props.token}
+          userId={props.userId}
           selectedCategory={selectedCategory}
           selectedSourceCountry={selectedSourceCountry}
           status={status}
@@ -275,6 +305,7 @@ function OrdersPendingLayout(props) {
         <Grid item className={classes.selectField}>
           <SourceCountryDestinationCountryAndCategoryFilters
             token={props.token}
+            userId={props.userId}
             sourceCountryList={sourceCountryList}
             destinationCountryList={destinationCountryList}
             selectedSourceCountry={selectedSourceCountry}
@@ -317,9 +348,12 @@ function OrdersPendingLayout(props) {
         onClose={() => [setOpen(false), history.push("/orders")]}
       >
         <DialogContent>
-          <OrderFormContainer
+          <OrderForm
             token={props.token}
+            userId={props.userId}
             handleDialogOpenStatus={handleDialogOpenStatus}
+            handleSuccessfulCreateSnackbar={handleSuccessfulCreateSnackbar}
+            handleFailedSnackbar={handleFailedSnackbar}
           />
         </DialogContent>
       </Dialog>
@@ -341,6 +375,16 @@ function OrdersPendingLayout(props) {
           <Typography>This is the fourth Inner Container</Typography>
         </Grid>
       </Grid>
+      <Snackbar
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{
+          style: { backgroundColor: alert.backgroundColor },
+        }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => setAlert({ ...alert, open: false })}
+        autoHideDuration={4000}
+      />
     </Grid>
   );
 }

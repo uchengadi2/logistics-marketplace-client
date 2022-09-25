@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Field, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import { TextField } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
@@ -15,11 +17,12 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import data from "./../../apis/local";
+import api from "./../../apis/local";
+import { EDIT_USER } from "../../actions/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: 600,
+    marginTop: 10,
   },
   formStyles: {
     width: 600,
@@ -27,9 +30,10 @@ const useStyles = makeStyles((theme) => ({
   submitButton: {
     borderRadius: 10,
     height: 40,
-    width: 150,
-    marginLeft: 180,
+    width: 100,
+    marginLeft: 200,
     marginTop: 30,
+    marginBottom: 20,
     color: "white",
     backgroundColor: theme.palette.common.blue,
     "&:hover": {
@@ -38,78 +42,190 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderEmailField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter user email address"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      style={{ marginTop: 15 }}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderPasswordField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter user password"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      style={{ marginTop: 15 }}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderConfirmPasswordField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Re-enter password for confirmation"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      //value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+      style={{ marginTop: 15 }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
+const renderNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Enter the name of the user"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      // value={formInput.name}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      style={{ marginTop: 15 }}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+
+      //onChange={handleInput}
+    />
+  );
+};
+
 function UserEditForm(props) {
+  const { params } = props;
   const classes = useStyles();
-  const [role, setRole] = useState("");
-  const [type, setType] = useState();
-  const [value, setValue] = useState("staff");
-  const [params, setParams] = useState({});
-  const [selectedRole, setSelectedRole] = useState();
-  const [selectedType, setSelectedType] = useState();
+  const [role, setRole] = useState(params.role);
+  const [type, setType] = useState(params.type);
+  const [loading, setLoading] = useState(false);
+  const [vendorList, setVendorList] = useState([]);
+  const [vendor, setVendor] = useState(params.vendor);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchData = async () => {
-      let allData = [];
-      data.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
-      const response = await data.get(`/users/${props.params.id}`);
-      const workingData = Object.values(response.data.data);
-      let row = {};
-      workingData.map((user) => {
-        console.log("this is the user:", user);
-        row = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          type: user.type,
-          active: user.active,
-        };
+    const fetchVendorData = async () => {
+      let allData = [{ id: "all", name: "All" }];
+      api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+      const response = await api.get("/vendors");
+      const workingData = response.data.data.data;
+      workingData.map((vendor) => {
+        allData.push({
+          id: vendor._id,
+          name: `${vendor.vendorNumber} - ${vendor.name}`,
+        });
       });
-      setParams(row);
-      setSelectedRole(row.role);
-      setSelectedType(row.type);
+      setVendorList(allData);
     };
 
     //call the function
 
-    fetchData().catch(console.error);
+    fetchVendorData().catch(console.error);
   }, []);
 
   const handleUserRoleChange = (event) => {
     setRole(event.target.value);
-    setSelectedRole(event.target.value);
   };
 
   const handleTypeChange = (event) => {
     setType(event.target.value);
-    setSelectedType(event.target.value);
   };
 
-  const renderNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="User Name"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.name}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        style={{ marginTop: 15 }}
+  const handleVendorChange = (event) => {
+    setVendor(event.target.value);
+  };
 
-        //onChange={handleInput}
-      />
-    );
+  //get the country list
+  const renderVendorList = () => {
+    return vendorList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    });
   };
 
   const renderUserRoleField = ({
@@ -127,10 +243,10 @@ function UserEditForm(props) {
           <Select
             labelId="role"
             id="role"
-            value={selectedRole ? selectedRole : params.role}
+            value={role}
             onChange={handleUserRoleChange}
             label="Role"
-            style={{ marginTop: 15, width: 500 }}
+            style={{ marginTop: 15, width: 500, height: 38 }}
           >
             <MenuItem value={"admin"}>Admin</MenuItem>
             <MenuItem value={"user"}>User</MenuItem>
@@ -138,37 +254,9 @@ function UserEditForm(props) {
             <MenuItem value={"partner_admin"}>Partner Admin</MenuItem>
             <MenuItem value={"customer"}>Customer</MenuItem>
           </Select>
-          <FormHelperText>User Role</FormHelperText>
+          <FormHelperText>Select User Role</FormHelperText>
         </FormControl>
       </Box>
-    );
-  };
-
-  const renderEmailField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="User Email Address"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        value={params.email}
-        fullWidth
-        //required
-        type={type}
-        {...custom}
-        disabled
-        style={{ marginTop: 15 }}
-
-        //onChange={handleInput}
-      />
     );
   };
 
@@ -189,7 +277,7 @@ function UserEditForm(props) {
           <RadioGroup
             aria-label="type"
             name="type"
-            value={selectedType ? selectedType : params.type}
+            value={type}
             onChange={handleTypeChange}
           >
             <Grid item container direction="row">
@@ -221,15 +309,87 @@ function UserEditForm(props) {
       </Box>
     );
   };
+
+  const renderVendorField = ({
+    input,
+    label,
+    meta: { touched, error, invalid },
+    type,
+    id,
+    ...custom
+  }) => {
+    return (
+      <Box>
+        <FormControl variant="outlined">
+          {/* <InputLabel id="vendor_city">City</InputLabel> */}
+          <Select
+            labelId="vendor"
+            id="vendor"
+            value={vendor}
+            onChange={handleVendorChange}
+            label="Vendor"
+            style={{ height: 38, width: 500 }}
+          >
+            {renderVendorList()}
+          </Select>
+          <FormHelperText>Select Vendor</FormHelperText>
+        </FormControl>
+      </Box>
+    );
+  };
+
+  const buttonContent = () => {
+    return <React.Fragment> Submit</React.Fragment>;
+  };
+
   const onSubmit = (formValues) => {
-    props.onSubmit(formValues);
+    setLoading(true);
+    const data = {
+      name: formValues.name ? formValues.name : params.name,
+      email: formValues.email ? formValues.email : params.email,
+      role: role,
+      // password: formValues.password,
+      // passwordConfirm: formValues.passwordConfirm,
+      type: type,
+      vendor: vendor,
+    };
+
+    if (data) {
+      const editForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.patch(`/users/${params.id}`, data);
+
+        if (response.data.status === "success") {
+          dispatch({
+            type: EDIT_USER,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulEditSnackbar(
+            `${response.data.data.data.name} User is updated successfully!!!`
+          );
+          props.handleEditDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      editForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   return (
-    <>
+    <div className={classes.root}>
       <Grid item container justifyContent="center">
         <FormLabel
-          style={{ color: "blue", fontSize: "1.5em" }}
+          style={{ color: "grey", fontSize: "1.3em" }}
           component="legend"
         >
           User Details
@@ -237,10 +397,11 @@ function UserEditForm(props) {
       </Grid>
       <Box
         component="form"
-        id="userForm"
+        id="userEditForm"
         // onSubmit={onSubmit}
         sx={{
           width: 500,
+          height: 450,
         }}
         noValidate
         autoComplete="off"
@@ -251,8 +412,23 @@ function UserEditForm(props) {
           id="email"
           name="email"
           type="email"
+          defaultValue={params.email}
           component={renderEmailField}
         />
+        {/* <Field
+          label=""
+          id="password"
+          name="password"
+          type="password"
+          component={renderPasswordField}
+        />
+        <Field
+          label=""
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          component={renderConfirmPasswordField}
+        /> */}
 
         <Grid container direction="row">
           <Grid item style={{ width: "100%" }}>
@@ -260,6 +436,7 @@ function UserEditForm(props) {
               label=""
               id="name"
               name="name"
+              defaultValue={params.name}
               type="text"
               component={renderNameField}
             />
@@ -278,7 +455,15 @@ function UserEditForm(props) {
           label=""
           id="type"
           name="type"
+          type="text"
           component={renderTypeRadioField}
+        />
+        <Field
+          label=""
+          id="vendor"
+          name="vendor"
+          type="text"
+          component={renderVendorField}
         />
 
         <Button
@@ -286,14 +471,18 @@ function UserEditForm(props) {
           className={classes.submitButton}
           onClick={props.handleSubmit(onSubmit)}
         >
-          Update User
+          {loading ? (
+            <CircularProgress size={30} color="inherit" />
+          ) : (
+            buttonContent()
+          )}
         </Button>
       </Box>
       {/* </form> */}
-    </>
+    </div>
   );
 }
 
 export default reduxForm({
-  form: "userForm",
+  form: "userEditForm",
 })(UserEditForm);

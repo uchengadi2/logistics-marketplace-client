@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
+import Snackbar from "@material-ui/core/Snackbar";
 import DialogContent from "@material-ui/core/DialogContent";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
@@ -10,6 +11,7 @@ import { fetchUsers } from "../../actions";
 import DataGridContainer from "../DataGridContainer";
 import UserEdit from "./UserEdit";
 import UserDelete from "./UserDelete";
+import UserEditForm from "./UserEditForm";
 
 class UserList extends React.Component {
   constructor(props) {
@@ -19,6 +21,11 @@ class UserList extends React.Component {
       deleteOpen: false,
       id: null,
       params: {},
+      alert: {
+        open: false,
+        message: "",
+        backgroundColor: "",
+      },
     };
   }
   componentDidMount() {
@@ -35,6 +42,29 @@ class UserList extends React.Component {
     this.setState({ editOpen: false });
   };
 
+  handleSuccessfulEditSnackbar = (message) => {
+    // history.push("/categories/new");
+    this.setState({ editOpen: false });
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#4BB543",
+      },
+    });
+  };
+
+  handleFailedSnackbar = (message) => {
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#FF3232",
+      },
+    });
+    this.setState({ editOpen: false });
+  };
+
   renderEditDialogForm = () => {
     //token will be used here
     return (
@@ -48,10 +78,13 @@ class UserList extends React.Component {
           ]}
         >
           <DialogContent>
-            <UserEdit
+            <UserEditForm
               token={this.props.token}
+              userId={this.props.userId}
               params={this.state.params}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
+              handleSuccessfulEditSnackbar={this.handleSuccessfulEditSnackbar}
+              handleFailedSnackbar={this.handleFailedSnackbar}
             />
           </DialogContent>
         </Dialog>
@@ -90,7 +123,6 @@ class UserList extends React.Component {
       { field: "numbering", headerName: "S/n", width: 100 },
       { field: "name", headerName: "User Name", width: 300 },
       { field: "type", headerName: "Type", width: 150 },
-      { field: "role", headerName: "Role", width: 150 },
       { field: "email", headerName: "Email Address", width: 250 },
       { field: "vendor", headerName: "Vendor", width: 200 },
       {
@@ -133,10 +165,12 @@ class UserList extends React.Component {
         ),
       },
     ];
+
     this.props.users.map((user) => {
+      console.log("single user:", user);
       let row = {
         numbering: ++counter,
-        id: user.email,
+        id: user.id,
         name: user.name,
         type: user.type,
         role: user.role,
@@ -153,6 +187,16 @@ class UserList extends React.Component {
         {this.renderDeleteDialogForm()}
         {this.renderEditDialogForm()}
         {this.renderUsersList()}
+        <Snackbar
+          open={this.state.alert.open}
+          message={this.state.alert.message}
+          ContentProps={{
+            style: { backgroundColor: this.state.alert.backgroundColor },
+          }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => this.setState({ alert: { ...alert, open: false } })}
+          autoHideDuration={4000}
+        />
       </>
     );
   }

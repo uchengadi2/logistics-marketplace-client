@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
+import Snackbar from "@material-ui/core/Snackbar";
 
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -16,6 +17,7 @@ import data from "./../../apis/local";
 import ProductListPerVendor from "./../products/ProductListPerVendor";
 import ProductListByCountry from "../products/ProductListByCountry";
 import VendorSelectFilter from "./filters/VendorSelectFilter";
+import ProductForm from "../products/ProductForm";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,6 +65,11 @@ const useStyles = makeStyles((theme) => ({
 function ProductLayout(props) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    backgroundColor: "",
+  });
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [countryList, setCountryList] = useState([{ id: "", name: "" }]);
   const [selectedVendor, setSelectedVendor] = useState("all");
@@ -133,6 +140,25 @@ function ProductLayout(props) {
   const handleDialogOpenStatus = () => {
     // history.push("/categories/new");
     setOpen(false);
+  };
+
+  const handleSuccessfulCreateSnackbar = (message) => {
+    // history.push("/categories/new");
+    setOpen({ open: false });
+    setAlert({
+      open: true,
+      message: message,
+      backgroundColor: "#4BB543",
+    });
+  };
+
+  const handleFailedSnackbar = (message) => {
+    setAlert({
+      open: true,
+      message,
+      backgroundColor: "#FF3232",
+    });
+    setOpen({ open: false });
   };
 
   const handleCountryChange = (value) => {
@@ -206,10 +232,12 @@ function ProductLayout(props) {
         onClose={() => [setOpen(false), history.push("/products")]}
       >
         <DialogContent>
-          <ProductFormContainer
-            token={props.token}
+          <ProductForm
             userId={props.userId}
+            token={props.token}
             handleDialogOpenStatus={handleDialogOpenStatus}
+            handleSuccessfulCreateSnackbar={handleSuccessfulCreateSnackbar}
+            handleFailedSnackbar={handleFailedSnackbar}
           />
         </DialogContent>
       </Dialog>
@@ -231,6 +259,16 @@ function ProductLayout(props) {
           <Typography>This is the fourth Inner Container</Typography>
         </Grid>
       </Grid>
+      <Snackbar
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{
+          style: { backgroundColor: alert.backgroundColor },
+        }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => setAlert({ ...alert, open: false })}
+        autoHideDuration={4000}
+      />
     </Grid>
   );
 }

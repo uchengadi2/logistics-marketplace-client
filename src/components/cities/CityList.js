@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
+import Snackbar from "@material-ui/core/Snackbar";
 import DialogContent from "@material-ui/core/DialogContent";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
@@ -11,6 +12,7 @@ import { fetchCities } from "../../actions";
 import DataGridContainer from "../DataGridContainer";
 import CityEdit from "./CityEdit";
 import CityDelete from "./CityDelete";
+import CityEditForm from "./CityEditForm";
 
 class CityList extends React.Component {
   constructor(props) {
@@ -21,6 +23,11 @@ class CityList extends React.Component {
       blacklistOpen: false,
       id: null,
       params: {},
+      alert: {
+        open: false,
+        message: "",
+        backgroundColor: "",
+      },
     };
   }
   componentDidMount() {
@@ -37,6 +44,29 @@ class CityList extends React.Component {
     this.setState({ editOpen: false });
   };
 
+  handleSuccessfulEditSnackbar = (message) => {
+    // history.push("/categories/new");
+    this.setState({ editOpen: false });
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#4BB543",
+      },
+    });
+  };
+
+  handleFailedSnackbar = (message) => {
+    this.setState({
+      alert: {
+        open: true,
+        message: message,
+        backgroundColor: "#FF3232",
+      },
+    });
+    this.setState({ editOpen: false });
+  };
+
   renderEditDialogForm = () => {
     //token will be used here
     return (
@@ -50,10 +80,13 @@ class CityList extends React.Component {
           ]}
         >
           <DialogContent>
-            <CityEdit
+            <CityEditForm
               token={this.props.token}
               params={this.state.params}
+              userId={this.props.userId}
               handleEditDialogOpenStatus={this.handleEditDialogOpenStatus}
+              handleSuccessfulEditSnackbar={this.handleSuccessfulEditSnackbar}
+              handleFailedSnackbar={this.handleFailedSnackbar}
             />
           </DialogContent>
         </Dialog>
@@ -110,9 +143,8 @@ class CityList extends React.Component {
     const columns = [
       { field: "numbering", headerName: "S/n", width: 100 },
       { field: "name", headerName: "City Name", width: 300 },
-      { field: "description", headerName: "Description", width: 350 },
       { field: "country", headerName: "Country", width: 250 },
-      { field: "security", headerName: "Security Status", width: 70 },
+      { field: "code", headerName: "City Code", width: 150 },
       {
         field: "editaction",
         headerName: "",
@@ -177,8 +209,9 @@ class CityList extends React.Component {
         id: city.id,
         name: city.name,
         description: city.description,
-        country: city.country[0],
-        security: city.securityStatus,
+        country: city.country,
+        code: city.code,
+        state: city.state,
       };
       rows.push(row);
     });
@@ -192,6 +225,16 @@ class CityList extends React.Component {
         {this.renderEditDialogForm()}
         {this.renderCitiesList()}
         {this.renderBlackListDialogForm()}
+        <Snackbar
+          open={this.state.alert.open}
+          message={this.state.alert.message}
+          ContentProps={{
+            style: { backgroundColor: this.state.alert.backgroundColor },
+          }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => this.setState({ alert: { ...alert, open: false } })}
+          autoHideDuration={4000}
+        />
       </>
     );
   }

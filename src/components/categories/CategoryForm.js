@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { Field, reduxForm } from "redux-form";
+import { useDispatch } from "react-redux";
+
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import { TextField } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
+import api from "./../../apis/local";
+import { CREATE_CATEGORY } from "../../actions/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 10,
     height: 40,
     width: 100,
-    marginLeft: 150,
+    marginLeft: 100,
     marginTop: 30,
     color: "white",
     backgroundColor: theme.palette.common.blue,
@@ -31,107 +36,121 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const renderNameField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      //error={touched && invalid}
+      helperText="Category Name"
+      variant="outlined"
+      label={label}
+      id={input.name}
+      defaultValue={input.value}
+      fullWidth
+      //required
+      type={type}
+      {...custom}
+      onChange={input.onChange}
+      inputProps={{
+        style: {
+          height: 1,
+        },
+      }}
+    />
+  );
+};
+
+const renderDescriptionField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  return (
+    <TextField
+      error={touched && invalid}
+      //placeholder="category description"
+      variant="outlined"
+      helperText="Description"
+      label={label}
+      id={input.name}
+      name={input.name}
+      defaultValue={input.value}
+      fullWidth
+      type={type}
+      style={{ marginTop: 20 }}
+      multiline={true}
+      minRows={4}
+      {...custom}
+      onChange={input.onChange}
+    />
+  );
+};
+
+const renderImageField = ({
+  input,
+  label,
+  meta: { touched, error, invalid },
+  type,
+  id,
+  ...custom
+}) => {
+  delete input.value;
+  return (
+    <TextField
+      id={input.name}
+      variant="outlined"
+      type={type}
+      fullWidth
+      style={{ marginTop: 20 }}
+      helperText="Upload Category Image"
+      {...custom}
+      onChange={input.onChange}
+      // inputProps={{
+      //   style: {
+      //     height: 5,
+      //   },
+      // }}
+    />
+  );
+};
+
 function CategoryForm(props) {
   const classes = useStyles();
-  const [image, setImage] = useState();
-  const [name, setName] = useState();
-  const [description, setDescription] = useState();
 
-  const onImageChange = (e) => {
-    setImage(e.target.value);
-    console.log("the image is:", image);
+  const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const buttonContent = () => {
+    return <React.Fragment> Submit</React.Fragment>;
   };
 
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-    //console.log("the image is:", image);
-  };
+  // const onSubmitt = (formValues) => {
+  //   const form = new FormData();
+  //   form.append("name", formValues.name);
+  //   form.append("description", formValues.description);
+  //   form.append("createdBy", props.userId);
+  //   if (formValues.image) {
+  //     form.append("image", formValues.image[0]);
+  //   }
 
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-    //console.log("the image is:", image);
-  };
-
-  const renderNameField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        //error={touched && invalid}
-        helperText="Enter the name of the Category"
-        variant="outlined"
-        label={label}
-        id={input.name}
-        //value={input.value}
-        fullWidth
-        multiline={true}
-        minRows={1}
-        //required
-        type={type}
-        {...custom}
-        {...input}
-      />
-    );
-  };
-
-  const renderDescriptionField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    return (
-      <TextField
-        error={touched && invalid}
-        //placeholder="category description"
-        variant="outlined"
-        helperText="Describe the Category"
-        label={label}
-        id={input.name}
-        name={input.name}
-        //value={input.value}
-        fullWidth
-        type={type}
-        style={{ marginTop: 20 }}
-        multiline={true}
-        minRows={6}
-        {...custom}
-        {...input}
-      />
-    );
-  };
-
-  const renderImageField = ({
-    input,
-    label,
-    meta: { touched, error, invalid },
-    type,
-    id,
-    ...custom
-  }) => {
-    delete input.value;
-    return (
-      <TextField
-        id={input.name}
-        variant="outlined"
-        type={type}
-        fullWidth
-        style={{ marginTop: 20 }}
-        helperText="Upload Category Image"
-        {...input}
-        {...custom}
-      />
-    );
-  };
+  //   props.onSubmit(form);
+  // };
 
   const onSubmit = (formValues) => {
+    setLoading(true);
+
+    const Str = require("@supercharge/strings");
+
     const form = new FormData();
     form.append("name", formValues.name);
     form.append("description", formValues.description);
@@ -140,7 +159,35 @@ function CategoryForm(props) {
       form.append("image", formValues.image[0]);
     }
 
-    props.onSubmit(form);
+    if (formValues) {
+      const createForm = async () => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${props.token}`;
+        const response = await api.post(`/categories`, form);
+
+        if (response.data.status === "success") {
+          dispatch({
+            type: CREATE_CATEGORY,
+            payload: response.data.data.data,
+          });
+
+          props.handleSuccessfulCreateSnackbar(
+            `${response.data.data.data.name} Category is created successfully!!!`
+          );
+          props.handleDialogOpenStatus();
+          setLoading(false);
+        } else {
+          props.handleFailedSnackbar(
+            "Something went wrong, please try again!!!"
+          );
+        }
+      };
+      createForm().catch((err) => {
+        props.handleFailedSnackbar();
+        console.log("err:", err.message);
+      });
+    } else {
+      props.handleFailedSnackbar("Something went wrong, please try again!!!");
+    }
   };
 
   return (
@@ -150,8 +197,8 @@ function CategoryForm(props) {
         // id="categoryForm"
         // onSubmit={onSubmit}
         sx={{
-          width: 400,
-          height: 450,
+          width: 300,
+          height: 400,
         }}
         noValidate
         autoComplete="off"
@@ -163,7 +210,7 @@ function CategoryForm(props) {
           justifyContent="center"
         >
           <FormLabel
-            style={{ color: "blue", fontSize: "1.5em" }}
+            style={{ color: "grey", fontSize: "1.2em" }}
             component="legend"
           >
             Create A New Category
@@ -200,7 +247,11 @@ function CategoryForm(props) {
           className={classes.submitButton}
           onClick={props.handleSubmit(onSubmit)}
         >
-          Submit
+          {loading ? (
+            <CircularProgress size={30} color="inherit" />
+          ) : (
+            buttonContent()
+          )}
         </Button>
       </Box>
     </form>
